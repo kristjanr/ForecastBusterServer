@@ -1,6 +1,10 @@
-.classpath
-.project
+.classpath.project
 .settings/
 .idea/
 ForecastBuster.iml
 /target
+*.class
+# Package Files #
+*.jar
+*.war
+*.ear
