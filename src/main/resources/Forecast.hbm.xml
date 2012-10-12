@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+        "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="ee.kristjan.Forecast" table="forecast">
+        <id name="id" type="long" column="forecastid">
+            <generator class="increment"/>
+        </id>
+        <property name="date">
+            <column name="date"/>
+        </property>
+        <property name="timeOfDay">
+            <column name="timeOfDay"/>
+        </property>
+        <property name="timeOfUpdate">
+            <column name="timeOfUpdate"/>
+        </property>
+    </class>
+</hibernate-mapping>

@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+        "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="ee.kristjan.Place" table="place">
+        <id name="id" type="long" column="placeid">
+            <generator class="increment"/>
+        </id>
+        <property name="name">
+            <column name="name"/>
+        </property>
+        <property name="phenomenon">
+            <column name="phenomenon"/>
+        </property>
+        <property name="tempMin">
+            <column name="tempmin"/>
+        </property>
+        <property name="tempMax">
+            <column name="tempmax"/>
+        </property>
+        <many-to-one name="forecast" class="ee.kristjan.Forecast" column="forecastid" cascade="all"/>
+    </class>
+</hibernate-mapping>
