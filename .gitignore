@@ -8,3 +8,4 @@ ForecastBuster.iml
 *.jar
 *.war
 *.ear
+/logs
