@@ -1,5 +1,3 @@
-package ee.kristjan;
-
 public class Place {
     private long id;
     private String name;

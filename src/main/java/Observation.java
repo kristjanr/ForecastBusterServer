@@ -1,5 +1,3 @@
-package ee.kristjan;
-
 import java.util.Date;
 
 public class Observation {

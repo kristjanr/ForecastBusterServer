@@ -1,5 +1,3 @@
-package ee.kristjan;
-
 public class Station {
     private long id;
     private String name;

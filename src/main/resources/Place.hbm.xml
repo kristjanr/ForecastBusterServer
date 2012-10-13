@@ -3,7 +3,7 @@
         "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
         "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping>
-    <class name="ee.kristjan.Place" table="place">
+    <class name="Place" table="place">
         <id name="id" type="long" column="placeid">
             <generator class="increment"/>
         </id>
@@ -19,6 +19,6 @@
         <property name="tempMax">
             <column name="tempmax"/>
         </property>
-        <many-to-one name="forecast" class="ee.kristjan.Forecast" column="forecastid" cascade="all"/>
+        <many-to-one name="forecast" class="Forecast" column="forecastid" cascade="all"/>
     </class>
 </hibernate-mapping>

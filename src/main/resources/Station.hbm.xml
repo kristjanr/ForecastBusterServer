@@ -3,7 +3,7 @@
         "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
         "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping>
-    <class name="ee.kristjan.Station" table="station">
+    <class name="Station" table="station">
         <id name="id" type="long" column="stationid">
             <generator class="native"/>
         </id>
@@ -16,7 +16,7 @@
         <property name="airTemperature">
             <column name="airtemperature"/>
         </property>
-        <many-to-one name="observation" class="ee.kristjan.Observation" column="observationid"
+        <many-to-one name="observation" class="Observation" column="observationid"
                      cascade="all"/>
     </class>
 </hibernate-mapping>
