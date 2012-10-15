@@ -6,9 +6,6 @@ import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
@@ -19,14 +16,11 @@ import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 
-public class XMLParser {
-    Logger log = LoggerFactory.getLogger(XMLParser.class);
+public class XMLFetcher {
+    static Logger log = LoggerFactory.getLogger(XMLFetcher.class);
 
-    // constructor
-    public XMLParser() {
-
+    public XMLFetcher() {
     }
-
 
     public static Document getDocFromUrl(String url) {
         String xml = null;
@@ -57,11 +51,12 @@ public class XMLParser {
             doc.getDocumentElement().normalize();
 
         } catch (Exception e) {
-        e.printStackTrace();
+            e.printStackTrace();
         }
         return doc;
     }
-    public Document getDomElement(String xml) {
+
+    public static Document getDomElement(String xml) {
         Document doc = null;
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         try {
@@ -83,28 +78,5 @@ public class XMLParser {
             return null;
         }
         return doc;
-    }
-
-    public final String getElementValue(Node elem) {
-        Node child;
-        if (elem != null) {
-            if (elem.hasChildNodes()) {
-                for (child = elem.getFirstChild(); child != null; child = child.getNextSibling()) {
-                    if (child.getNodeType() == Node.TEXT_NODE) {
-                        return child.getNodeValue();
-                    } else if (child.getNodeName() == Main.KEY_NIGHT) {
-                        return Main.KEY_NIGHT;
-                    } else if (child.getNodeName() == Main.KEY_DAY) {
-                        return Main.KEY_DAY;
-                    }
-                }
-            }
-        }
-        return "";
-    }
-
-    public String getValue(Element item, String str) {
-        NodeList n = item.getElementsByTagName(str);
-        return getElementValue(n.item(0));
     }
 }

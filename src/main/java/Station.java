@@ -13,14 +13,14 @@ public class Station {
 
     public Station(Observation observation, NodeList nodeList) {
         this.observation = observation;
-        for(int i = 0; i < nodeList.getLength(); i++){
+        for (int i = 0; i < nodeList.getLength(); i++) {
             Node node = nodeList.item(i);
             String nodeName = node.getNodeName();
-            if(nodeName.equals(Main.KEY_NAME)) {
+            if (nodeName.equals(Main.KEY_NAME)) {
                 setName(node.getTextContent());
-            } else if (nodeName.equals(Main.KEY_PHENOMENON) && !node.getTextContent().isEmpty()){
+            } else if (nodeName.equals(Main.KEY_PHENOMENON) && !node.getTextContent().isEmpty()) {
                 setPhenomenon(node.getTextContent());
-            } else if (nodeName.equals(KEY_AIRTEMPERATURE) && !node.getTextContent().isEmpty()){
+            } else if (nodeName.equals(KEY_AIRTEMPERATURE) && !node.getTextContent().isEmpty()) {
                 setAirTemperature(node.getTextContent());
             }
         }

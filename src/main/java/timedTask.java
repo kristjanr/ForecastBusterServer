@@ -9,13 +9,13 @@ import java.text.ParseException;
 import java.util.TimerTask;
 
 public class TimedTask extends TimerTask {
-    static Logger log = LoggerFactory.getLogger(XMLParser.class);
+    static Logger log = LoggerFactory.getLogger(XMLFetcher.class);
 
     public void run() {
         getDatabaseAccessObject().initSession();
 
-        Document forecastDocument = XMLParser.getDocFromUrl(Main.FORECAST_URL);
-        //Document forecastDocument = XMLParser.getDocFromFile(Main.FORECAST_FILE);
+        Document forecastDocument = XMLFetcher.getDocFromUrl(Main.FORECAST_URL);
+        //Document forecastDocument = XMLFetcher.getDocFromFile(Main.FORECAST_FILE);
         NodeList forecastNodeList = forecastDocument.getElementsByTagName(Main.KEY_FORECAST);
         try {
             iterateForecasts(forecastNodeList);
@@ -24,8 +24,8 @@ public class TimedTask extends TimerTask {
         }
         saveForecastsAndPlaces();
 
-        Document observationDocument = XMLParser.getDocFromUrl(Main.FORECAST_URL);
-        //Document observationDocument = XMLParser.getDocFromFile(Main.OBSERVATION_FILE);
+        Document observationDocument = XMLFetcher.getDocFromUrl(Main.OBSERVATION_URL);
+        //Document observationDocument = XMLFetcher.getDocFromFile(Main.OBSERVATION_FILE);
         NodeList observationNodeList = observationDocument.getElementsByTagName(Main.KEY_OBSERVATIONS);
         Observation observation = new Observation();
         try {
