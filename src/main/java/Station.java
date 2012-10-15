@@ -1,9 +1,37 @@
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 public class Station {
+
+
     private long id;
     private String name;
     private String phenomenon;
-    private float airTemperature;
+    private Float airTemperature;
     private Observation observation;
+    private static final String KEY_AIRTEMPERATURE = "airtemperature";
+
+    public Station(Observation observation, NodeList nodeList) {
+        this.observation = observation;
+        for(int i = 0; i < nodeList.getLength(); i++){
+            Node node = nodeList.item(i);
+            String nodeName = node.getNodeName();
+            if(nodeName.equals(Main.KEY_NAME)) {
+                setName(node.getTextContent());
+            } else if (nodeName.equals(Main.KEY_PHENOMENON) && !node.getTextContent().isEmpty()){
+                setPhenomenon(node.getTextContent());
+            } else if (nodeName.equals(KEY_AIRTEMPERATURE) && !node.getTextContent().isEmpty()){
+                setAirTemperature(node.getTextContent());
+            }
+        }
+    }
+
+    public void createStation(NodeList thirdNodeList) {
+    }
+
+    public void setAirTemperature(String temp) {
+        setAirTemperature(Float.parseFloat(temp));
+    }
 
     public String getName() {
         return name;
@@ -21,11 +49,11 @@ public class Station {
         this.phenomenon = phenomenon;
     }
 
-    public float getAirTemperature() {
+    public Float getAirTemperature() {
         return airTemperature;
     }
 
-    public void setAirTemperature(float airTemperature) {
+    public void setAirTemperature(Float airTemperature) {
         this.airTemperature = airTemperature;
     }
 

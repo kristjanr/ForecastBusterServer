@@ -1,5 +1,6 @@
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.service.ServiceRegistry;
 import org.hibernate.service.ServiceRegistryBuilder;
@@ -30,5 +31,10 @@ public class DatabaseAccessObject {
         ServiceRegistry serviceRegistry = new ServiceRegistryBuilder().applySettings(databaseConfiguration.getProperties()).buildServiceRegistry();
         SessionFactory sessionFactory = databaseConfiguration.buildSessionFactory(serviceRegistry);
         hibernateSession = sessionFactory.openSession();
+    }
+    public void save(Object object) {
+            Transaction transaction = hibernateSession.beginTransaction();
+            hibernateSession.save(object);
+            transaction.commit();
     }
 }
