@@ -25,13 +25,20 @@ public class Main {
     public static ArrayList<Forecast> forecasts = new ArrayList(8);
     public static final String KEY_OBSERVATIONS = "observations";
     static final String KEY_FORECAST = "forecast";
-    private static int timeBetweenFetchingData = 3600000;
+    private static int timeBetweenFetchingData = 2000; //3600000;
 
     public static void main(String[] args) {
         Timer timer = new Timer("timer");
         TimedTask timedTask = new TimedTask();
+        getDatabaseAccessObject().initSession();
         timer.schedule(timedTask, 0, timeBetweenFetchingData);
     }
 
 
+    static DatabaseAccessObject getDatabaseAccessObject() {
+        if (databaseAccessObject == null) {
+            databaseAccessObject = new DatabaseAccessObject();
+        }
+        return databaseAccessObject;
+    }
 }

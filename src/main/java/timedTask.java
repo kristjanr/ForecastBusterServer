@@ -12,10 +12,8 @@ public class TimedTask extends TimerTask {
     static Logger log = LoggerFactory.getLogger(XMLFetcher.class);
 
     public void run() {
-        getDatabaseAccessObject().initSession();
-
-        Document forecastDocument = XMLFetcher.getDocFromUrl(Main.FORECAST_URL);
-        //Document forecastDocument = XMLFetcher.getDocFromFile(Main.FORECAST_FILE);
+        //Document forecastDocument = XMLFetcher.getDocFromUrl(Main.FORECAST_URL);
+        Document forecastDocument = XMLFetcher.getDocFromFile(Main.FORECAST_FILE);
         NodeList forecastNodeList = forecastDocument.getElementsByTagName(Main.KEY_FORECAST);
         try {
             iterateForecasts(forecastNodeList);
@@ -24,8 +22,8 @@ public class TimedTask extends TimerTask {
         }
         saveForecastsAndPlaces();
 
-        Document observationDocument = XMLFetcher.getDocFromUrl(Main.OBSERVATION_URL);
-        //Document observationDocument = XMLFetcher.getDocFromFile(Main.OBSERVATION_FILE);
+        //Document observationDocument = XMLFetcher.getDocFromUrl(Main.OBSERVATION_URL);
+        Document observationDocument = XMLFetcher.getDocFromFile(Main.OBSERVATION_FILE);
         NodeList observationNodeList = observationDocument.getElementsByTagName(Main.KEY_OBSERVATIONS);
         Observation observation = new Observation();
         try {
@@ -49,24 +47,17 @@ public class TimedTask extends TimerTask {
 
     static void saveForecastsAndPlaces() {
         for (int i = 0; i < Main.forecasts.size(); i++) {
-            getDatabaseAccessObject().save(Main.forecasts.get(i));
+            Main.getDatabaseAccessObject().save(Main.forecasts.get(i));
             for (int j = 0; j < Main.forecasts.get(i).getPlaces().size(); j++) {
-                getDatabaseAccessObject().save(Main.forecasts.get(i).getPlaces().get(j));
+                Main.getDatabaseAccessObject().save(Main.forecasts.get(i).getPlaces().get(j));
             }
         }
     }
 
     private static void saveObservationAndStations(Observation observation) {
-        getDatabaseAccessObject().save(observation);
+        Main.getDatabaseAccessObject().save(observation);
         for (int i = 0; i < observation.getStations().size(); i++) {
-            getDatabaseAccessObject().save(observation.getStations().get(i));
+            Main.getDatabaseAccessObject().save(observation.getStations().get(i));
         }
-    }
-
-    static DatabaseAccessObject getDatabaseAccessObject() {
-        if (Main.databaseAccessObject == null) {
-            Main.databaseAccessObject = new DatabaseAccessObject();
-        }
-        return Main.databaseAccessObject;
     }
 }
