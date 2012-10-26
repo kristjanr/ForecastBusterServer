@@ -19,12 +19,12 @@ public class Forecast {
     private String text;
     private List<Place> places = new ArrayList<Place>();
 
-    static void createForecast(Element firstElement, Node secondNode) throws ParseException {
+    void createForecast(Element firstElement, Node secondNode) throws ParseException {
         if (secondNode.getNodeName() == Main.KEY_NIGHT || secondNode.getNodeName() == Main.KEY_DAY) {
-            Forecast forecast = new Forecast();
-            forecast.setDate(firstElement.getAttribute(Main.KEY_DATE));
 
-            forecast.setTimeOfDay(secondNode.getNodeName());
+            setDate(firstElement.getAttribute(Main.KEY_DATE));
+
+            setTimeOfDay(secondNode.getNodeName());
             NodeList thirdNodeList = secondNode.getChildNodes();
 
             for (int k = 0; k < thirdNodeList.getLength(); k++) {
@@ -32,21 +32,20 @@ public class Forecast {
                 String s = thirdNode.getNodeName();
 
                 if (s.equals(Main.KEY_PHENOMENON)) {
-                    forecast.setPhenomenon(thirdNode.getFirstChild().getTextContent());
+                    setPhenomenon(thirdNode.getFirstChild().getTextContent());
                 } else if (s.equals(Main.KEY_TEMPMAX)) {
-                    forecast.setTempMax(thirdNode.getFirstChild().getTextContent());
+                    setTempMax(thirdNode.getFirstChild().getTextContent());
 
                 } else if (s.equals(Main.KEY_TEMPMIN)) {
-                    forecast.setTempMin(thirdNode.getFirstChild().getTextContent());
+                    setTempMin(thirdNode.getFirstChild().getTextContent());
 
                 } else if (s.equals(Main.KEY_TEXT)) {
-                    forecast.setText(thirdNode.getFirstChild().getTextContent());
+                    setText(thirdNode.getFirstChild().getTextContent());
                 } else if (s.equals(Main.KEY_PLACE)) {
 
-                    Place.createPlace(forecast, thirdNode);
+                    Place.createPlace(this, thirdNode);
                 }
             }
-            Main.forecasts.add(forecast);
         }
     }
 

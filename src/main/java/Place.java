@@ -89,6 +89,7 @@ public class Place {
     public void setTempMax(String tempMax) {
         this.tempMax = Float.parseFloat(tempMax);
     }
+
     public void setTempMax(Float tempMax) {
         this.tempMax = tempMax;
     }

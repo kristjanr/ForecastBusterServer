@@ -1,4 +1,3 @@
-import java.util.ArrayList;
 import java.util.Timer;
 
 public class Main {
@@ -22,16 +21,16 @@ public class Main {
     public static final String KEY_SPEEDMAX = "speedmax";
     public static final String KEY_SEA = "sea";
     public static final String KEY_PEIPSI = "peipsi";
-    public static ArrayList<Forecast> forecasts = new ArrayList(8);
     public static final String KEY_OBSERVATIONS = "observations";
     static final String KEY_FORECAST = "forecast";
-    private static int timeBetweenFetchingData = 2000; //3600000;
+    static int timeBetweenFetchingData = 3600000;
 
     public static void main(String[] args) {
         Timer timer = new Timer("timer");
-        TimedTask timedTask = new TimedTask();
+        DataFetchTask dataFetchTask = new DataFetchTask();
         getDatabaseAccessObject().initSession();
-        timer.schedule(timedTask, 0, timeBetweenFetchingData);
+
+        timer.schedule(dataFetchTask, 0, timeBetweenFetchingData);
     }
 
 

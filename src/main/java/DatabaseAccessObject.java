@@ -26,15 +26,17 @@ public class DatabaseAccessObject {
         Configuration databaseConfiguration = new Configuration();
         databaseConfiguration.configure();
         databaseConfiguration.setProperty("hibernate.connection.url", "jdbc:postgresql://localhost:5432/postgres");
-        databaseConfiguration.setProperty("hibernate.connection.username", "weather");
-        databaseConfiguration.setProperty("hibernate.connection.password", "blaa");
+        databaseConfiguration.setProperty("hibernate.connection.username", "postgres");
+        databaseConfiguration.setProperty("hibernate.connection.password", "postgres");
         ServiceRegistry serviceRegistry = new ServiceRegistryBuilder().applySettings(databaseConfiguration.getProperties()).buildServiceRegistry();
         SessionFactory sessionFactory = databaseConfiguration.buildSessionFactory(serviceRegistry);
         hibernateSession = sessionFactory.openSession();
+
     }
+
     public void save(Object object) {
-            Transaction transaction = hibernateSession.beginTransaction();
-            hibernateSession.save(object);
-            transaction.commit();
+        Transaction transaction = hibernateSession.beginTransaction();
+        hibernateSession.save(object);
+        transaction.commit();
     }
 }

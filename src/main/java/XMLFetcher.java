@@ -24,9 +24,8 @@ public class XMLFetcher {
 
     public static Document getDocFromUrl(String url) {
         String xml = null;
-
+        log.debug("Starting to fetch data from url: " + url);
         try {
-            // defaultHttpClient
             DefaultHttpClient httpClient = new DefaultHttpClient();
             HttpPost httpPost = new HttpPost(url);
 
@@ -38,11 +37,13 @@ public class XMLFetcher {
             e.printStackTrace();
         }
         Document doc = getDomElement(xml);
+        log.debug("Finished fetching data.");
         return doc;
     }
 
     public static Document getDocFromFile(String location) {
         Document doc = null;
+        log.debug("Starting to fetch data from file: " + location);
         try {
             File fXmlFile = new File(location);
             DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
@@ -53,11 +54,12 @@ public class XMLFetcher {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        log.debug("Finished fetching data.");
         return doc;
     }
 
     public static Document getDomElement(String xml) {
-        Document doc = null;
+        Document doc;
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         try {
 
