@@ -11,6 +11,9 @@ public class Station {
     private Observation observation;
     private static final String KEY_AIRTEMPERATURE = "airtemperature";
 
+    public Station() {
+    }
+
     public Station(Observation observation, NodeList nodeList) {
         this.observation = observation;
         for (int i = 0; i < nodeList.getLength(); i++) {
@@ -24,9 +27,6 @@ public class Station {
                 setAirTemperature(node.getTextContent());
             }
         }
-    }
-
-    public void createStation(NodeList thirdNodeList) {
     }
 
     public void setAirTemperature(String temp) {
