@@ -1,3 +1,4 @@
+import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
@@ -14,6 +15,7 @@ import java.util.Properties;
 public class DatabaseAccessObject {
     private Session hibernateSession;
     static org.slf4j.Logger log = LoggerFactory.getLogger(DatabaseAccessObject.class);
+    private final Object sessionLockObject = new Object();
 
     public DatabaseAccessObject() {
     }
@@ -59,22 +61,35 @@ public class DatabaseAccessObject {
     }
 
     void saveObservationAndStations(Observation observation) {
-        hibernateSession.save(observation);
-        for (int i = 0; i < observation.getStations().size(); i++) {
-            hibernateSession.save(observation.getStations().get(i));
+        synchronized (sessionLockObject) {
+            hibernateSession.save(observation);
+
+            for (int i = 0; i < observation.getStations().size(); i++) {
+                hibernateSession.save(observation.getStations().get(i));
+            }
         }
     }
 
     void saveForecastsAndPlaces(ArrayList<Forecast> forecasts) {
         Forecast forecast;
         List<Place> places;
-        for (int i = 0; i < forecasts.size(); i++) {
-            forecast = forecasts.get(i);
-            hibernateSession.save(forecast);
-            places = forecast.getPlaces();
-            for (int j = 0; j < places.size(); j++) {
-                hibernateSession.save(places.get(j));
+        synchronized (sessionLockObject) {
+            for (int i = 0; i < forecasts.size(); i++) {
+                forecast = forecasts.get(i);
+                hibernateSession.save(forecast);
+                places = forecast.getPlaces();
+                for (int j = 0; j < places.size(); j++) {
+                    hibernateSession.save(places.get(j));
+                }
             }
+        }
+    }
+
+    public List querySQL(String queryString) {
+        synchronized (sessionLockObject) {
+            Query query = hibernateSession.createSQLQuery(queryString);
+            List results = query.list();
+            return results;
         }
     }
 }

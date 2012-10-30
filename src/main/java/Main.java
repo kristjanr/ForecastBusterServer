@@ -1,5 +1,3 @@
-import java.util.Timer;
-
 public class Main {
     public static DatabaseAccessObject databaseAccessObject = new DatabaseAccessObject();
     public static final String FORECAST_URL = "http://www.emhi.ee/ilma_andmed/xml/forecast.php";
@@ -23,21 +21,20 @@ public class Main {
     public static final String KEY_PEIPSI = "peipsi";
     public static final String KEY_OBSERVATIONS = "observations";
     static final String KEY_FORECAST = "forecast";
-    static int timeBetweenFetchingData = 3600000;
+    static int timeBetweenFetchingData = 1000*60*60;
+    static int timeBetweenQuering = 1000*60*60*24;
 
     public static void main(String[] args) {
-        Timer timer = new Timer("timer");
-        DataFetchTask dataFetchTask = new DataFetchTask();
         getDatabaseAccessObject().initSession();
-
-        timer.schedule(dataFetchTask, 0, timeBetweenFetchingData);
+        Query query = new Query(getDatabaseAccessObject());
+        Fetch fetch = new Fetch(getDatabaseAccessObject());
     }
 
-
-    static DatabaseAccessObject getDatabaseAccessObject() {
+    public static DatabaseAccessObject getDatabaseAccessObject() {
         if (databaseAccessObject == null) {
             databaseAccessObject = new DatabaseAccessObject();
         }
         return databaseAccessObject;
     }
+
 }
