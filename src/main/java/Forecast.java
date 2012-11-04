@@ -12,12 +12,17 @@ public class Forecast {
     private long id;
     private Date date;
     private String timeOfDay;
-    private Date timeOfUpdate = new Date();
+    private Date timeOfUpdate;
     private String phenomenon;
     private float tempMin;
     private float tempMax;
     private String text;
-    private List<Place> places = new ArrayList<Place>();
+    private List<Place> places;
+
+    public Forecast() {
+        timeOfUpdate = new Date();
+        places = new ArrayList<Place>();
+    }
 
     void createForecast(Element firstElement, Node secondNode) throws ParseException {
         if (secondNode.getNodeName() == Main.KEY_NIGHT || secondNode.getNodeName() == Main.KEY_DAY) {

@@ -6,7 +6,7 @@ public class Fetch {
     public Fetch(DatabaseAccessObject databaseAccessObject) {
         this.databaseAccessObject = databaseAccessObject;
         Timer fetchTimer = new Timer("fetchTimer");
-        DataFetchTask dataFetchTask = new DataFetchTask();
+        FetchTask dataFetchTask = new FetchTask();
         fetchTimer.schedule(dataFetchTask, 0, Main.timeBetweenFetchingData);
     }
 }
