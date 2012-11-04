@@ -2,7 +2,7 @@ import java.util.List;
 import java.util.Timer;
 
 public class Query {
-    static List queryList;
+    static List ForecastsForTomorrow;
     static DatabaseAccessObject databaseAccessObject;
 
     public Query(DatabaseAccessObject databaseAccessObject) {
@@ -12,11 +12,12 @@ public class Query {
         queryTimer.schedule(queryTask, 0, Main.timeBetweenQuering);
     }
 
-    public static List getQueryList() {
-        return queryList;
+    public static List getForecastsForTomorrow() {
+        return ForecastsForTomorrow;
     }
 
-    public static void setQueryList(List queryList) {
-        Query.queryList = queryList;
+    public static void setForecastsForTomorrow(List list) {
+        Query.ForecastsForTomorrow = list;
     }
+
 }
