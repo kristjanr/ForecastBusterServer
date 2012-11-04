@@ -16,5 +16,17 @@
         <property name="timeOfUpdate">
             <column name="timeOfUpdate"/>
         </property>
+        <property name="phenomenon">
+            <column name="phenomenon"/>
+        </property>
+        <property name="tempMax">
+            <column name="tempmax"/>
+        </property>
+        <property name="tempMin">
+            <column name="tempmin"/>
+        </property>
+        <property name="text">
+            <column name="text"/>
+        </property>
     </class>
 </hibernate-mapping>
