@@ -3,7 +3,7 @@
         "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
         "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping>
-    <class name="Forecast" table="forecast">
+    <class name="forecastbuster.incoming.entities.Forecast" table="forecast">
         <id name="id" type="long" column="forecastid">
             <generator class="increment"/>
         </id>
@@ -25,7 +25,7 @@
         <property name="tempMin">
             <column name="tempmin"/>
         </property>
-        <property name="text">
+        <property name="text" type="text">
             <column name="text"/>
         </property>
     </class>

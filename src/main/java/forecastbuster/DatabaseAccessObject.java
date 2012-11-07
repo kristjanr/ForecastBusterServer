@@ -1,3 +1,8 @@
+package forecastbuster;
+
+import forecastbuster.incoming.entities.Forecast;
+import forecastbuster.incoming.entities.Observation;
+import forecastbuster.incoming.entities.Place;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -5,6 +10,7 @@ import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.service.ServiceRegistry;
 import org.hibernate.service.ServiceRegistryBuilder;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
@@ -14,7 +20,7 @@ import java.util.Properties;
 
 public class DatabaseAccessObject {
     private Session hibernateSession;
-    static org.slf4j.Logger log = LoggerFactory.getLogger(DatabaseAccessObject.class);
+    static Logger log = LoggerFactory.getLogger(DatabaseAccessObject.class);
     private final Object sessionLockObject = new Object();
 
     public DatabaseAccessObject() {
@@ -47,7 +53,7 @@ public class DatabaseAccessObject {
         transaction.commit();
     }
 
-    void saveObservationsAndSForecasts(Observation observation, ArrayList<Forecast> forecasts) {
+    public void saveObservationsAndSForecasts(Observation observation, ArrayList<Forecast> forecasts) {
         long begin = new Date().getTime();
 
         Transaction transaction = hibernateSession.beginTransaction();
@@ -60,7 +66,7 @@ public class DatabaseAccessObject {
         log.info("Saved observation and forecasts in " + timeForSavingForecastsAndObservations);
     }
 
-    void saveObservationAndStations(Observation observation) {
+    public void saveObservationAndStations(Observation observation) {
         synchronized (sessionLockObject) {
             hibernateSession.save(observation);
 
@@ -70,7 +76,7 @@ public class DatabaseAccessObject {
         }
     }
 
-    void saveForecastsAndPlaces(ArrayList<Forecast> forecasts) {
+    public void saveForecastsAndPlaces(ArrayList<Forecast> forecasts) {
         Forecast forecast;
         List<Place> places;
         synchronized (sessionLockObject) {
@@ -84,7 +90,28 @@ public class DatabaseAccessObject {
             }
         }
     }
-
+    public List querySQL(String queryString, String name, Object value) {
+        synchronized (sessionLockObject) {
+            Query query = hibernateSession.createSQLQuery(queryString);
+            if (value!=null){
+                query.setParameter(name, value);
+            }
+            List results = query.list();
+            return results;
+        }
+    }
+    public List querySQL(String queryString, ArrayList parameters) {
+        synchronized (sessionLockObject) {
+            Query query = hibernateSession.createSQLQuery(queryString);
+            if (!parameters.isEmpty()){
+                for (int i = 0; i < parameters.size(); i++){
+                    query.setParameter(i,parameters.get(i));
+                }
+            }
+            List results = query.list();
+            return results;
+        }
+    }
     public List querySQL(String queryString) {
         synchronized (sessionLockObject) {
             Query query = hibernateSession.createSQLQuery(queryString);

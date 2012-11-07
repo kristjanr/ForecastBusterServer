@@ -1,3 +1,6 @@
+package forecastbuster.incoming.entities;
+
+import forecastbuster.Main;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -24,7 +27,7 @@ public class Forecast {
         places = new ArrayList<Place>();
     }
 
-    void createForecast(Element firstElement, Node secondNode) throws ParseException {
+    public void createForecast(Element firstElement, Node secondNode) throws ParseException {
         if (secondNode.getNodeName() == Main.KEY_NIGHT || secondNode.getNodeName() == Main.KEY_DAY) {
 
             setDate(firstElement.getAttribute(Main.KEY_DATE));

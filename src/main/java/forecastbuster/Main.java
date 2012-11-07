@@ -1,3 +1,9 @@
+package forecastbuster;
+
+import forecastbuster.incoming.Fetch;
+import forecastbuster.outgoing.Query;
+import forecastbuster.outgoing.Server;
+
 public class Main {
     public static DatabaseAccessObject databaseAccessObject = new DatabaseAccessObject();
     public static final String FORECAST_URL = "http://www.emhi.ee/ilma_andmed/xml/forecast.php";
@@ -20,14 +26,24 @@ public class Main {
     public static final String KEY_SEA = "sea";
     public static final String KEY_PEIPSI = "peipsi";
     public static final String KEY_OBSERVATIONS = "observations";
-    static final String KEY_FORECAST = "forecast";
-    static int timeBetweenFetchingData = 1000*60*60;
-    static int timeBetweenQuering = 1000*60*60*24;
+    public static final String KEY_FORECAST = "forecast";
+    public static int timeBetweenFetchingData = 1000 * 60 * 60;
+    public static int timeBetweenQuering = 1000 * 60 * 60 * 24;
+    static Query query;
+
+    public static final Object object = new Object();
+
 
     public static void main(String[] args) {
-        getDatabaseAccessObject().initSession();
-        Query query = new Query(getDatabaseAccessObject());
+        databaseAccessObject.initSession();
+
         Fetch fetch = new Fetch(getDatabaseAccessObject());
+
+        query = new Query();
+        query.startQuery(getDatabaseAccessObject());
+
+        Server server = new Server();
+        server.startServer(query);
     }
 
     public static DatabaseAccessObject getDatabaseAccessObject() {
@@ -37,4 +53,7 @@ public class Main {
         return databaseAccessObject;
     }
 
+    public static Query getQuery() {
+        return query;
+    }
 }

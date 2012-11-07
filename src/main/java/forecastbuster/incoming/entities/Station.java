@@ -1,3 +1,6 @@
+package forecastbuster.incoming.entities;
+
+import forecastbuster.Main;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
