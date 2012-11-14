@@ -2,23 +2,16 @@ package forecastbuster.outgoing;
 
 import forecastbuster.DatabaseAccessObject;
 import forecastbuster.Main;
+import forecastbuster.outgoing.entities.ForecastedDay;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Timer;
+import java.util.*;
 
 public class Query {
-    List forecastsForTomorrow;
-    List forecastsFor1DayAfterTomorrow;
-    List forecastsFor2DaysAfterTomorrow;
-    List forecastsFor3DaysAfterTomorrow;
+    private static DatabaseAccessObject databaseAccessObject;
+    private TreeMap<Calendar, ForecastedDay> forecastDays;
 
-    static DatabaseAccessObject databaseAccessObject;
     public Query() {
-        forecastsForTomorrow = new ArrayList();
-        forecastsFor1DayAfterTomorrow = new ArrayList();
-        forecastsFor2DaysAfterTomorrow  = new ArrayList();
-        forecastsFor3DaysAfterTomorrow  = new ArrayList();
+        forecastDays = new TreeMap<Calendar, ForecastedDay>();
     }
 
     public void startQuery(DatabaseAccessObject databaseAccessObject) {
@@ -28,35 +21,15 @@ public class Query {
         queryTimer.schedule(queryTask, 0, Main.timeBetweenQuering);
     }
 
-    public List getForecastsForTomorrow() {
-        return forecastsForTomorrow;
+    static DatabaseAccessObject getDatabaseAccessObject() {
+        return databaseAccessObject;
     }
 
-    public void setForecastsForTomorrow(List list) {
-        forecastsForTomorrow = list;
+    public TreeMap<Calendar, ForecastedDay> getForecastDays() {
+        return forecastDays;
     }
 
-    public void setForecastsFor1DayAfterTomorrow(List list) {
-        this.forecastsFor1DayAfterTomorrow =list;
-    }
-
-    public List getForecastsFor1DayAfterTomorrow() {
-        return forecastsFor1DayAfterTomorrow;
-    }
-
-    public List getForecastsFor2DaysAfterTomorrow() {
-        return forecastsFor2DaysAfterTomorrow;
-    }
-
-    public void setForecastsFor2DaysAfterTomorrow(List forecastsFor2DaysAfterTomorrow) {
-        this.forecastsFor2DaysAfterTomorrow = forecastsFor2DaysAfterTomorrow;
-    }
-
-    public List getForecastsFor3DaysAfterTomorrow() {
-        return forecastsFor3DaysAfterTomorrow;
-    }
-
-    public void setForecastsFor3DaysAfterTomorrow(List forecastsFor3DaysAfterTomorrow) {
-        this.forecastsFor3DaysAfterTomorrow = forecastsFor3DaysAfterTomorrow;
+    public void setForecastDays(TreeMap<Calendar, ForecastedDay> forecastDays) {
+        this.forecastDays = forecastDays;
     }
 }

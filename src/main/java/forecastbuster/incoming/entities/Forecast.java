@@ -20,7 +20,7 @@ public class Forecast {
     private float tempMin;
     private float tempMax;
     private String text;
-    private List<Place> places;
+    private ArrayList<Place> places;
 
     public Forecast() {
         timeOfUpdate = new Date();
@@ -160,7 +160,7 @@ public class Forecast {
         return places;
     }
 
-    public void setPlaces(List<Place> places) {
+    public void setPlaces(ArrayList<Place> places) {
         this.places = places;
     }
 }

@@ -2,7 +2,6 @@ package forecastbuster;
 
 import forecastbuster.incoming.Fetch;
 import forecastbuster.outgoing.Query;
-import forecastbuster.outgoing.Server;
 
 public class Main {
     public static DatabaseAccessObject databaseAccessObject = new DatabaseAccessObject();
@@ -31,9 +30,6 @@ public class Main {
     public static int timeBetweenQuering = 1000 * 60 * 60 * 24;
     static Query query;
 
-    public static final Object object = new Object();
-
-
     public static void main(String[] args) {
         databaseAccessObject.initSession();
 
@@ -42,8 +38,8 @@ public class Main {
         query = new Query();
         query.startQuery(getDatabaseAccessObject());
 
-        Server server = new Server();
-        server.startServer(query);
+        //Server server = new Server();
+        //server.startServer(query);
     }
 
     public static DatabaseAccessObject getDatabaseAccessObject() {
