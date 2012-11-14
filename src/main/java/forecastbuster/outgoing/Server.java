@@ -1,10 +1,13 @@
 package forecastbuster.outgoing;
 
+import forecastbuster.outgoing.entities.ForecastedDay;
 import org.slf4j.LoggerFactory;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
-import java.util.List;
+import java.util.Calendar;
+import java.util.TreeMap;
 
 public class Server {
     static org.slf4j.Logger log = LoggerFactory.getLogger(Server.class);
@@ -15,13 +18,8 @@ public class Server {
 
     public void startServer(Query query) {
         this.query = query;
-        createFile();
-
-    }
-
-    void createFile() {
         synchronized (query) {
-            while (query.getForecastsForTomorrow().isEmpty()) {
+            while (query.getForecastDays().isEmpty()) {
                 try {
                     query.wait();
                 } catch (InterruptedException e) {
@@ -29,18 +27,22 @@ public class Server {
                 }
             }
         }
+        createXMLFileFromList(query.getForecastDays());
 
-        List list = query.getForecastsForTomorrow();
+    }
+
+    void createXMLFileFromList(TreeMap<Calendar, ForecastedDay> map) {
+
         try {
-            File file = new File("C:\\apache-tomcat-6.0.35\\webapps\\ROOT", "Forecasts.csv");
+            File file = new File("D:\\Projekt", "Forecasts.xml");
             if (!file.exists()) {
                 file.createNewFile();
             }
             FileWriter fstream = new FileWriter(file.getAbsoluteFile());
             BufferedWriter out = new BufferedWriter(fstream);
-            // TO DO
-            out.write(list.toString());
-            log.debug("Wrote " + list.toString() + " to file " + file.getAbsoluteFile());
+            String xmlText = XMLParse.getTestXMLText();
+            out.write(xmlText);
+            log.debug("Wrote " + xmlText + " to file " + file.getAbsoluteFile());
             out.close();
         } catch (Exception e) {
             log.error(e.getMessage());
