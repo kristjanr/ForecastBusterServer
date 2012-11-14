@@ -19,7 +19,7 @@
         <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-c3p0</artifactId>
-            <version>4.1.1.Final</version>
+            <version>4.1.4.Final</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
@@ -30,12 +30,12 @@
         <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-core</artifactId>
-            <version>4.1.1.Final</version>
+            <version>4.1.4.Final</version>
         </dependency>
         <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-entitymanager</artifactId>
-            <version>4.1.1.Final</version>
+            <version>4.1.4.Final</version>
         </dependency>
         <dependency>
             <groupId>org.mockito</groupId>
@@ -69,9 +69,9 @@
             <version>1.6.4</version>
         </dependency>
         <dependency>
-            <groupId>xstream</groupId>
+            <groupId>com.thoughtworks.xstream</groupId>
             <artifactId>xstream</artifactId>
-            <version>1.2.2</version>
+            <version>1.4.3</version>
         </dependency>
     </dependencies>
     <build>
