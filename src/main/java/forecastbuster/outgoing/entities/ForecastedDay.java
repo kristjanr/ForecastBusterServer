@@ -1,9 +1,12 @@
 package forecastbuster.outgoing.entities;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
 public class ForecastedDay {
     private Calendar date;
+    private String dateString;
     private Forecast forecasted1DayBefore;
     private Forecast forecasted2DaysBefore;
     private Forecast forecasted3DaysBefore;
@@ -13,8 +16,26 @@ public class ForecastedDay {
         setDate(currentDate);
     }
 
+    public String getDateString() {
+        return dateString;
+    }
+
+    public void setDateString(String dateString) {
+        Calendar cal = Calendar.getInstance();
+        SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
+        try {
+            cal.setTime(sdf.parse(dateString));
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        setDate(cal);
+    }
+
     public void setDate(Calendar date) {
         this.date = date;
+        SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
+        String dateString = sdf.format(date.getTime());
+        this.dateString = dateString;
     }
 
     public Calendar getDate() {
