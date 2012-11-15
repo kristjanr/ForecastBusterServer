@@ -54,9 +54,30 @@ public class Server {
 
     private String createXMLString(Query query) {
         XStream xstream = new XStream(new DomDriver());
-        xstream.alias("Forecast", Forecast.class);
-        xstream.alias("ForecastedDay", ForecastedDay.class);
-        xstream.alias("Place", Place.class);
+        xstream.useAttributeFor(ForecastedDay.class, "dateString");
+        xstream.useAttributeFor(Place.class, "name");
+        xstream.alias("day", ForecastedDay.class);
+        xstream.alias("place", Place.class);
+        xstream.alias("weatherforecasthistory", Query.class);
+        xstream.aliasField("date", ForecastedDay.class, "dateString");
+        xstream.aliasField("onedaybefore", ForecastedDay.class, "forecasted1DayBefore");
+        xstream.aliasField("twodaysbefore", ForecastedDay.class, "forecasted2DaysBefore");
+        xstream.aliasField("threedaysbefore", ForecastedDay.class, "forecasted3DaysBefore");
+        xstream.aliasField("fourdaysbefore", ForecastedDay.class, "forecasted4DaysBefore");
+        xstream.aliasField("nightphenomenon", Forecast.class, "nightPhenomenon");
+        xstream.aliasField("nightmaxtemp", Forecast.class, "nightMaxTemp");
+        xstream.aliasField("nightmintemp", Forecast.class, "nightMinTemp");
+        xstream.aliasField("dayphenomenon", Forecast.class, "dayPhenomenon");
+        xstream.aliasField("daymaxtemp", Forecast.class, "dayMaxTemp");
+        xstream.aliasField("daymintemp", Forecast.class, "dayMinTemp");
+        xstream.aliasField("daymaxtemp", Place.class, "dayMaxTemp");
+        xstream.aliasField("nightmintemp", Place.class, "nightMinTemp");
+        xstream.aliasField("nightphenomenon", Place.class, "nightPhenomenon");
+        xstream.aliasField("dayphenomenon", Place.class, "dayPhenomenon");
+        xstream.aliasField("", Forecast.class, "");
+        xstream.omitField(ForecastedDay.class, "date");
+        xstream.omitField(Forecast.class, "date");
+        xstream.omitField(Place.class, "date");
         xstream.addImplicitMap(Query.class, "forecastDays", ForecastedDay.class, "date");
         String xmlString = xstream.toXML(query);
         return xmlString;
