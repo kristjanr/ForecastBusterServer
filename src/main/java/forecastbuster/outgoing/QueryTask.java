@@ -4,6 +4,7 @@ import forecastbuster.DatabaseAccessObject;
 import forecastbuster.outgoing.entities.Forecast;
 import forecastbuster.outgoing.entities.ForecastedDay;
 import forecastbuster.outgoing.entities.Place;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
@@ -15,6 +16,7 @@ public class QueryTask extends TimerTask {
     // the date of the latest forecast there is
     Calendar latestDate;
     ArrayList fourDayForecastQueries;
+    static org.slf4j.Logger log = LoggerFactory.getLogger(QueryTask.class);
 
     public QueryTask(Query query) {
         this.query = query;
@@ -26,6 +28,7 @@ public class QueryTask extends TimerTask {
         TreeMap<Calendar, ForecastedDay> forecastDays = createForecastedDaysFromQueries();
         synchronized (query) {
             query.setForecastDays(forecastDays);
+            log.info("Created entities from queries. The size of the TreeMap is "+ forecastDays.size());
             query.notify();
         }
     }
@@ -138,7 +141,7 @@ public class QueryTask extends TimerTask {
             }
             //put forecasted day to the map
             if (!forecastedDay.isEmpty()) {
-                forecastedDays.put(forecastedDay.getDateOfForecast(), forecastedDay);
+                forecastedDays.put(forecastedDay.getDate(), forecastedDay);
             }
         }
         return forecastedDays;

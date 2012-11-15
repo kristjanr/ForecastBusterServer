@@ -3,22 +3,22 @@ package forecastbuster.outgoing.entities;
 import java.util.Calendar;
 
 public class ForecastedDay {
-    private Calendar dateOfForecast;
+    private Calendar date;
     private Forecast forecasted1DayBefore;
     private Forecast forecasted2DaysBefore;
     private Forecast forecasted3DaysBefore;
     private Forecast forecasted4DaysBefore;
 
     public ForecastedDay(Calendar currentDate) {
-        setDateOfForecast(currentDate);
+        setDate(currentDate);
     }
 
-    public void setDateOfForecast(Calendar dateOfForecast) {
-        this.dateOfForecast = dateOfForecast;
+    public void setDate(Calendar date) {
+        this.date = date;
     }
 
-    public Calendar getDateOfForecast() {
-        return dateOfForecast;
+    public Calendar getDate() {
+        return date;
     }
 
     public Forecast getForecasted1DayBefore() {
