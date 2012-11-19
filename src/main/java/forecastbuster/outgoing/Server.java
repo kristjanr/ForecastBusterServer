@@ -35,9 +35,9 @@ public class Server {
     }
 
     void writeXMLFile(TreeMap<Calendar, ForecastedDay> map) {
-
+        log.info("Starting to write XML file...");
         try {
-            File file = new File("/var/www", "Forecasts.xml");
+            File file = new File("~/", "Forecasts.xml");
             if (!file.exists()) {
                 file.createNewFile();
             }

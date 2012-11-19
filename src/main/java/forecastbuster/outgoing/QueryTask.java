@@ -46,6 +46,7 @@ public class QueryTask extends TimerTask {
 
         for (int i = 0; i < 4; i++) {
             List forecastsForGivenDayAfterTomorrow = queryForecastsForGivenDayAfterToday(i);
+            log.info("I have forecasts query from database in the list. It is the "+i+1+"-st query. The size of the list is "+forecastsForGivenDayAfterTomorrow.size());
             TreeMap<Calendar, Forecast> forecastsFromQuery = createForecasts(forecastsForGivenDayAfterTomorrow);
             if (!forecastsFromQuery.isEmpty()) {
                 fourDayForecastQueries.add(forecastsFromQuery);
@@ -73,7 +74,7 @@ public class QueryTask extends TimerTask {
 
     TreeMap<Calendar, ArrayList<Place>> createMapOfPlaceLists() {
         List placesDataFromQueries = getPlacesForecastsForTomorrow();
-
+        log.info("I have places query from database in the list. The size is "+placesDataFromQueries.size());
         ArrayList<Place> places;
         places = getPlacesFromObjectArrays(placesDataFromQueries);
 
@@ -178,14 +179,12 @@ public class QueryTask extends TimerTask {
 
     private String getSqlString(String sqlFileName) {
         InputStream inputStream = this.getClass().getResourceAsStream("/" + sqlFileName);
-        log.info(getClass().getResource("/" + sqlFileName).toString());
         String theString = convertStreamToString(inputStream);
-        log.info(theString);
         return theString;
     }
 
-    public static String convertStreamToString(java.io.InputStream is) {
-        java.util.Scanner s = new java.util.Scanner(is).useDelimiter("\\A");
+    public static String convertStreamToString(InputStream is) {
+        Scanner s = new Scanner(is).useDelimiter("\\A");
         return s.hasNext() ? s.next() : "";
     }
 }
