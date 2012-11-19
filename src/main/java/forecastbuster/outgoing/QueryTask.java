@@ -63,13 +63,19 @@ public class QueryTask extends TimerTask {
     TreeMap<Calendar, Forecast> createForecasts(List list) {
 
         TreeMap<Calendar, Forecast> forecastTreeMap = new TreeMap<Calendar, Forecast>(new MyDateComparator());
-        while (!list.isEmpty()) {
-            Forecast forecast = new Forecast();
-            Object[] forecastData = (Object[]) list.remove(0);
-            forecast.createForecast(forecastData);
-            forecastTreeMap.put((Calendar) forecast.getDate().clone(), forecast);
-            log.info("I have put a forecast with the date "+forecast.getDate().getTime()+ " in a TreeMap");
+        log.info("Starting while cycle in createForecasts.");
+        try{
+            while (!list.isEmpty()) {
+                Forecast forecast = new Forecast();
+                Object[] forecastData = (Object[]) list.remove(0);
+                forecast.createForecast(forecastData);
+                forecastTreeMap.put((Calendar) forecast.getDate().clone(), forecast);
+                log.info("I have put a forecast with the date "+forecast.getDate().getTime()+ " in a TreeMap");
+            }
+        } catch (Exception e){
+            log.error("While list ei käivitunud");
         }
+        log.info("Ended while cycle.");
         return forecastTreeMap;
     }
 
