@@ -6,14 +6,13 @@ import forecastbuster.outgoing.entities.ForecastedDay;
 import forecastbuster.outgoing.entities.Place;
 import org.slf4j.LoggerFactory;
 
+import java.io.InputStream;
 import java.util.*;
 
 public class QueryTask extends TimerTask {
     Query query;
     DatabaseAccessObject DAO;
-    // the date of the earliest forecast there is
     Calendar earliestDate;
-    // the date of the latest forecast there is
     Calendar latestDate;
     ArrayList fourDayForecastQueries;
     static org.slf4j.Logger log = LoggerFactory.getLogger(QueryTask.class);
@@ -21,6 +20,10 @@ public class QueryTask extends TimerTask {
     public QueryTask(Query query) {
         this.query = query;
         DAO = query.getDatabaseAccessObject();
+        fourDayForecastQueries = new ArrayList();
+        earliestDate = Calendar.getInstance();
+        latestDate = Calendar.getInstance();
+        latestDate.setTimeInMillis(0);
     }
 
     @Override
@@ -28,43 +31,35 @@ public class QueryTask extends TimerTask {
         TreeMap<Calendar, ForecastedDay> forecastDays = createForecastedDaysFromQueries();
         synchronized (query) {
             query.setForecastDays(forecastDays);
-            log.info("Created entities from queries. The size of the TreeMap is "+ forecastDays.size());
+            log.info("Created entities from queries. The size of the TreeMap is " + forecastDays.size());
             query.notify();
         }
     }
 
     private TreeMap<Calendar, ForecastedDay> createForecastedDaysFromQueries() {
-
-        fourDayForecastQueries = new ArrayList();
-        earliestDate = Calendar.getInstance();
-        latestDate = Calendar.getInstance();
-        latestDate.set(0, 0, 1);
-        populateFourForecastQueriesListAndFindDates();
-        TreeMap<Calendar, ArrayList<Place>> places = createPlacesLists();
-        TreeMap<Calendar, ForecastedDay> forecastedDayTreeMap = createForecastedDaysBetweenGivenDates(places);
-        return forecastedDayTreeMap;
+        doQueryAndPutForecastMapsToList();
+        TreeMap<Calendar, ArrayList<Place>> places = createMapOfPlaceLists();
+        return createForecastedDays(places);
     }
 
-    private void populateFourForecastQueriesListAndFindDates() {
+    void doQueryAndPutForecastMapsToList() {
 
         for (int i = 0; i < 4; i++) {
-            TreeMap<Calendar, Forecast> forecastsFromQuery = createForecasts(getForecastsForGivenDayAfterTomorrow(i));
+            List forecastsForGivenDayAfterTomorrow = queryForecastsForGivenDayAfterToday(i);
+            TreeMap<Calendar, Forecast> forecastsFromQuery = createForecasts(forecastsForGivenDayAfterTomorrow);
             if (!forecastsFromQuery.isEmpty()) {
-
                 fourDayForecastQueries.add(forecastsFromQuery);
-
-                Calendar forecastDate = forecastsFromQuery.pollFirstEntry().getKey();
-                if (forecastDate.before(earliestDate)) {
-                    earliestDate = forecastDate;
+                if (forecastsFromQuery.firstKey().before(earliestDate)) {
+                    earliestDate = (Calendar) forecastsFromQuery.firstKey().clone();
                 }
-                if (forecastDate.after(latestDate)) {
-                    latestDate = forecastDate;
+                if (forecastsFromQuery.lastKey().after(latestDate)) {
+                    latestDate = (Calendar) forecastsFromQuery.lastKey().clone();
                 }
             }
         }
     }
 
-    private TreeMap<Calendar, Forecast> createForecasts(List list) {
+    TreeMap<Calendar, Forecast> createForecasts(List list) {
 
         TreeMap<Calendar, Forecast> forecastTreeMap = new TreeMap<Calendar, Forecast>(new MyDateComparator());
         while (!list.isEmpty()) {
@@ -76,11 +71,11 @@ public class QueryTask extends TimerTask {
         return forecastTreeMap;
     }
 
-    private TreeMap<Calendar, ArrayList<Place>> createPlacesLists() {
+    TreeMap<Calendar, ArrayList<Place>> createMapOfPlaceLists() {
         List placesDataFromQueries = getPlacesForecastsForTomorrow();
 
         ArrayList<Place> places;
-        places = getPlacesList(placesDataFromQueries);
+        places = getPlacesFromObjectArrays(placesDataFromQueries);
 
         TreeMap<Calendar, ArrayList<Place>> placesListsMap = new TreeMap<Calendar, ArrayList<Place>>(new MyDateComparator());
 
@@ -94,7 +89,7 @@ public class QueryTask extends TimerTask {
         return placesListsMap;
     }
 
-    private ArrayList<Place> getPlacesList(List placesDataFromQueries) {
+    private ArrayList<Place> getPlacesFromObjectArrays(List placesDataFromQueries) {
         ArrayList<Place> places = new ArrayList();
         Iterator iterator = placesDataFromQueries.iterator();
         while (iterator.hasNext()) {
@@ -118,7 +113,7 @@ public class QueryTask extends TimerTask {
         return placesWithTheSameDate;
     }
 
-    private TreeMap<Calendar, ForecastedDay> createForecastedDaysBetweenGivenDates(TreeMap<Calendar, ArrayList<Place>> places) {
+    TreeMap<Calendar, ForecastedDay> createForecastedDays(TreeMap<Calendar, ArrayList<Place>> places) {
         TreeMap<Calendar, ForecastedDay> forecastedDays = new TreeMap<Calendar, ForecastedDay>(new MyDateComparator());
         for (Calendar currentDate = (Calendar) earliestDate.clone(); latestDate.compareTo(currentDate) >= 0; currentDate.add(Calendar.DAY_OF_MONTH, 1)) {
             ForecastedDay forecastedDay = new ForecastedDay((Calendar) currentDate.clone());
@@ -153,136 +148,44 @@ public class QueryTask extends TimerTask {
      *
      * @return The list of objects arrays (Object[]) containing data of places forecasts with all possible days. There are 6 places for each day. The forecasts for places are made only 1 day before teh subject date.     *
      */
-    private List getPlacesForecastsForTomorrow() {
-        String queryString =
-                "SELECT dp.fdate as fdate, dp.pname as pname, np.pphen AS nightphen, nt.avg AS nightmintemp, dp.pphen AS dayphen, dt.avg AS daymaxtemp " +
-                        "    FROM  " +
-                        "    (SELECT sub1.date fdate, sub1.name pname, sub1.phenomenon pphen " +
-                        "        FROM ( " +
-                        "        SELECT date, name, place.phenomenon, count(*) as cnnt " +
-                        "            FROM forecast, place  " +
-                        "            WHERE place.forecastid = forecast.forecastid AND forecast.timeofday = 'day' " +
-                        "            GROUP BY date, name, place.phenomenon                 " +
-                        "        ) AS sub1 " +
-                        "        GROUP BY sub1.date, sub1.name, pphen, sub1.cnnt " +
-                        "        HAVING    (sub1.date, sub1.name, sub1.cnnt) IN ( " +
-                        "        SELECT sub2.date, sub2.name, max(cnt) " +
-                        "            FROM ( " +
-                        "            SELECT f2.date, p2.name, p2.phenomenon AS pphen, count(*) AS cnt " +
-                        "                FROM forecast f2, place p2 " +
-                        "                WHERE p2.forecastid = f2.forecastid AND f2.timeofday = 'day' " +
-                        "                GROUP BY p2.name, f2.date, pphen                 " +
-                        "            ) AS sub2 " +
-                        "        GROUP BY date, name " +
-                        "        HAVING sub1.date=date AND sub1.name=name " +
-                        "        ) " +
-                        "    ) dp,     " +
-                        "    ( SELECT sub1.date fdate, sub1.name pname, sub1.phenomenon pphen " +
-                        "        FROM ( " +
-                        "        SELECT date, name, place.phenomenon, count(*) as cnnt " +
-                        "            FROM forecast, place  " +
-                        "            WHERE place.forecastid = forecast.forecastid AND forecast.timeofday = 'night' " +
-                        "            GROUP BY date, name, place.phenomenon                 " +
-                        "        ) AS sub1 " +
-                        "    GROUP BY sub1.date, sub1.name, pphen, sub1.cnnt " +
-                        "    HAVING    (sub1.date, sub1.name, sub1.cnnt) IN ( " +
-                        "        SELECT sub2.date, sub2.name, max(cnt) " +
-                        "            FROM ( " +
-                        "            SELECT f2.date, p2.name, p2.phenomenon AS pphen, count(*) AS cnt " +
-                        "                FROM forecast f2, place p2 " +
-                        "                WHERE p2.forecastid = f2.forecastid AND f2.timeofday = 'night' " +
-                        "                GROUP BY p2.name, f2.date, pphen                 " +
-                        "            ) AS sub2 " +
-                        "        GROUP BY date, name " +
-                        "        HAVING sub1.date=date AND sub1.name=name " +
-                        "        ) " +
-                        "    ) np,     " +
-                        "    ( SELECT forecast.date AS fdate, place.name AS pname, avg(place.tempmax) AS avg     " +
-                        "        FROM forecast, place     " +
-                        "        WHERE place.forecastid = forecast.forecastid AND forecast.timeofday = 'day' " +
-                        "        GROUP BY place.name, forecast.date " +
-                        "    ) dt,     " +
-                        "        ( SELECT forecast.date AS fdate, place.name AS pname, avg(place.tempmin) AS avg     " +
-                        "        FROM forecast, place     " +
-                        "        WHERE place.forecastid = forecast.forecastid AND forecast.timeofday = 'night' " +
-                        "        GROUP BY place.name, forecast.date " +
-                        "    ) nt     " +
-                        "    WHERE dp.fdate = np.fdate AND dp.pname = np.pname AND dp.fdate = dt.fdate AND dp.pname = dt.pname AND dp.fdate = nt.fdate AND dp.pname=nt.pname     " +
-                        "    GROUP BY dp.fdate, dp.pname, dayphen, daymaxtemp, nightphen, nightmintemp     " +
-                        "    ORDER BY dp.fdate, dp.pname;";
-
-        return DAO.querySQL(queryString);
-
+    List getPlacesForecastsForTomorrow() {
+        String queryString = getSqlString("place.sql");
+        List queryList = new ArrayList();
+        try {
+            queryList = DAO.querySQL(queryString);
+        } catch (Exception e) {
+            log.error(e.toString());
+        }
+        return queryList;
     }
 
     /**
      * This is the query for all forecasts.
      *
-     * @param daysAfterTomorrow the number of days before the forecasted day.
+     * @param daysAfterToday the number of days before the forecasted day.
      * @return The list of objects arrays (Object[]) containing data of forecasts with all possible days which were made on the given day before. There are one forecast for each day.
      */
-    private List getForecastsForGivenDayAfterTomorrow(int daysAfterTomorrow) {
-        String queryString = "SELECT dp.fdate as fdate, np.phen AS nightphen, nt.tempmax AS nighttempmax, nt.tempmin AS nighttempmin, dp.phen AS dayphen, dt.tempmax AS daytempmax, dt.tempmin AS daytempmin " +
-                "    FROM  " +
-                "    (SELECT sub1.date fdate, sub1.phenomenon phen " +
-                "        FROM ( " +
-                "        SELECT date, phenomenon, count(*) as cnnt " +
-                "            FROM forecast " +
-                "            WHERE forecast.timeofday = 'day' " +
-                "                AND date_part('day', forecast.date - forecast.timeofupdate) = :daysAfterTomorrow  " +
-                "            GROUP BY date, phenomenon " +
-                "        ) AS sub1 " +
-                "        GROUP BY sub1.date, phen, sub1.cnnt " +
-                "        HAVING    (sub1.date, sub1.cnnt) IN ( " +
-                "        SELECT sub2.date, max(cnt) " +
-                "            FROM ( " +
-                "            SELECT date, phenomenon, count(*) AS cnt " +
-                "                FROM forecast " +
-                "                WHERE timeofday = 'day' " +
-                "                    AND date_part('day', forecast.date - forecast.timeofupdate) = :daysAfterTomorrow " +
-                "                GROUP BY date, phenomenon " +
-                "            ) AS sub2 " +
-                "        GROUP BY date " +
-                "        HAVING sub1.date=date " +
-                "        ) " +
-                "    ) dp, " +
-                "    (SELECT sub1.date fdate, sub1.phenomenon phen " +
-                "        FROM ( " +
-                "        SELECT date, phenomenon, count(*) as cnnt " +
-                "            FROM forecast " +
-                "            WHERE forecast.timeofday = 'day' " +
-                "                AND date_part('day', forecast.date - forecast.timeofupdate) = :daysAfterTomorrow " +
-                "            GROUP BY date, phenomenon " +
-                "        ) AS sub1 " +
-                "        GROUP BY sub1.date, phen, sub1.cnnt " +
-                "        HAVING    (sub1.date, sub1.cnnt) IN ( " +
-                "        SELECT sub2.date, max(cnt) " +
-                "            FROM ( " +
-                "            SELECT date, phenomenon, count(*) AS cnt " +
-                "                FROM forecast " +
-                "                WHERE timeofday = 'night' " +
-                "                    AND date_part('day', forecast.date - forecast.timeofupdate) = :daysAfterTomorrow " +
-                "                GROUP BY date, phenomenon " +
-                "            ) AS sub2 " +
-                "        GROUP BY date " +
-                "        HAVING sub1.date=date " +
-                "        ) " +
-                "    ) np, " +
-                "    ( SELECT date, avg(tempmax) AS tempmax, avg(tempmin) AS tempmin " +
-                "        FROM forecast " +
-                "        WHERE timeofday = 'day' " +
-                "            AND date_part('day', forecast.date - forecast.timeofupdate) = :daysAfterTomorrow " +
-                "        GROUP BY date " +
-                "    ) dt, " +
-                "    ( SELECT date, avg(tempmax) AS tempmax, avg(tempmin) AS tempmin " +
-                "        FROM forecast " +
-                "        WHERE timeofday = 'night' " +
-                "            AND date_part('day', forecast.date - forecast.timeofupdate) = :daysAfterTomorrow " +
-                "        GROUP BY date " +
-                "    ) nt  " +
-                "    WHERE dp.fdate = np.fdate AND dt.date = dp.fdate AND nt.date = dp.fdate " +
-                "    ORDER BY dp.fdate;";
+    List queryForecastsForGivenDayAfterToday(int daysAfterToday) {
+        String queryString = getSqlString("forecast.sql");
+        List queryList = new ArrayList();
+        try {
+            queryList = DAO.querySQL(queryString, "daysAfterToday", daysAfterToday);
+        } catch (Exception e) {
+            log.error(e.toString());
+        }
+        return queryList;
+    }
 
-        return DAO.querySQL(queryString, "daysAfterTomorrow", daysAfterTomorrow);
+    private String getSqlString(String sqlFileName) {
+        InputStream inputStream = this.getClass().getResourceAsStream("/" + sqlFileName);
+        log.info(getClass().getResource("/" + sqlFileName).toString());
+        String theString = convertStreamToString(inputStream);
+        log.info(theString);
+        return theString;
+    }
+
+    public static String convertStreamToString(java.io.InputStream is) {
+        java.util.Scanner s = new java.util.Scanner(is).useDelimiter("\\A");
+        return s.hasNext() ? s.next() : "";
     }
 }
