@@ -1,6 +1,6 @@
 package forecastbuster.outgoing.entities;
 
-import java.sql.Timestamp;
+import java.sql.Date;
 import java.util.Calendar;
 import java.util.List;
 
@@ -29,9 +29,9 @@ public class Forecast {
     }
 
     private void setDate(Object date) {
-        Timestamp timestamp = (Timestamp) date;
+        Date tempDate = (Date) date;
         Calendar cal = Calendar.getInstance();
-        cal.setTimeInMillis(timestamp.getTime());
+        cal.setTimeInMillis(tempDate.getTime());
         setDate(cal);
     }
 
@@ -85,5 +85,21 @@ public class Forecast {
 
     public void setPlaces(List<Place> places) {
         this.places = places;
+    }
+
+    public double getNightMaxTemp() {
+        return nightMaxTemp;
+    }
+
+    public double getNightMinTemp() {
+        return nightMinTemp;
+    }
+
+    public double getDayMaxTemp() {
+        return dayMaxTemp;
+    }
+
+    public double getDayMinTemp() {
+        return dayMinTemp;
     }
 }

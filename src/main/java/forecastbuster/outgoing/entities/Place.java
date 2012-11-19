@@ -1,6 +1,6 @@
 package forecastbuster.outgoing.entities;
 
-import java.sql.Timestamp;
+import java.sql.Date;
 import java.util.Calendar;
 
 public class Place {
@@ -25,9 +25,9 @@ public class Place {
     }
 
     public void setDate(Object date) {
-        Timestamp timestamp = (Timestamp) date;
+        Date tempDate = (Date) date;
         Calendar cal = Calendar.getInstance();
-        cal.setTimeInMillis(timestamp.getTime());
+        cal.setTimeInMillis(tempDate.getTime());
         setDate(cal);
     }
 

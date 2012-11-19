@@ -7,7 +7,7 @@
         <id name="id" type="long" column="forecastid">
             <generator class="increment"/>
         </id>
-        <property name="date">
+        <property name="date" type="date" index="forecast_date_idx">
             <column name="date"/>
         </property>
         <property name="timeOfDay">
@@ -16,7 +16,7 @@
         <property name="timeOfUpdate">
             <column name="timeOfUpdate"/>
         </property>
-        <property name="phenomenon">
+        <property name="phenomenon" index="forecast_phenomenon_idx">
             <column name="phenomenon"/>
         </property>
         <property name="tempMax">

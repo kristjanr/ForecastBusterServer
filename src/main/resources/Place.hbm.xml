@@ -7,10 +7,10 @@
         <id name="id" type="long" column="placeid">
             <generator class="increment"/>
         </id>
-        <property name="name">
+        <property name="name" index="place_name_idx">
             <column name="name"/>
         </property>
-        <property name="phenomenon">
+        <property name="phenomenon" index="place_phenomenon_idx">
             <column name="phenomenon"/>
         </property>
         <property name="tempMin">
