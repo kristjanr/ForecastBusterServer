@@ -46,7 +46,7 @@ public class QueryTask extends TimerTask {
 
         for (int i = 0; i < 4; i++) {
             List forecastsForGivenDayAfterTomorrow = queryForecastsForGivenDayAfterToday(i);
-            log.info("I have forecasts query from database in the list. It is the "+i+1+"-st query. The size of the list is "+forecastsForGivenDayAfterTomorrow.size());
+            log.info("I have forecasts query from database in the list. It is the "+(i+1)+"-st query. The size of the list is "+forecastsForGivenDayAfterTomorrow.size());
             TreeMap<Calendar, Forecast> forecastsFromQuery = createForecasts(forecastsForGivenDayAfterTomorrow);
             if (!forecastsFromQuery.isEmpty()) {
                 fourDayForecastQueries.add(forecastsFromQuery);
@@ -68,6 +68,7 @@ public class QueryTask extends TimerTask {
             Object[] forecastData = (Object[]) list.remove(0);
             forecast.createForecast(forecastData);
             forecastTreeMap.put((Calendar) forecast.getDate().clone(), forecast);
+            log.info("I have put a forecast with the date "+forecast.getDate().getTime()+ " in a TreeMap");
         }
         return forecastTreeMap;
     }
