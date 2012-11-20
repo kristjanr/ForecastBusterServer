@@ -56,7 +56,7 @@ public class Place {
     }
 
     public void setNightMinTemp(double nightMinTemp) {
-        this.nightMinTemp = nightMinTemp;
+        this.nightMinTemp = (double) Math.round(nightMinTemp * 100) / 100;
     }
 
     public String getDayPhenomenon() {
@@ -72,6 +72,6 @@ public class Place {
     }
 
     public void setDayMaxTemp(double dayMaxTemp) {
-        this.dayMaxTemp = dayMaxTemp;
+        this.dayMaxTemp = (double) Math.round(dayMaxTemp * 100) / 100;
     }
 }
