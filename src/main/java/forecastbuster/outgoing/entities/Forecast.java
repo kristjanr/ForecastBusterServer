@@ -14,14 +14,20 @@ public class Forecast {
     private double dayMinTemp;
     private List<Place> places;
 
+    public Forecast(){
+        nightPhenomenon = null;
+    }
+
     public void createForecast(Object[] forecastData) {
         setDate(forecastData[0]);
-        setNightPhenomenon(forecastData[1]);
-        setNightMaxTemp((Double) forecastData[2]);
-        setNightMinTemp((Double) forecastData[3]);
-        setDayPhenomenon(forecastData[4]);
-        setDayMaxTemp((Double) forecastData[5]);
-        setDayMinTemp((Double) forecastData[6]);
+        if (forecastData[1] != null) {
+            setNightPhenomenon(forecastData[1]);
+            setNightMaxTemp((Double) forecastData[2]);
+            setNightMinTemp((Double) forecastData[3]);
+            setDayPhenomenon(forecastData[4]);
+            setDayMaxTemp((Double) forecastData[5]);
+            setDayMinTemp((Double) forecastData[6]);
+        }
     }
 
     private void setNightPhenomenon(Object o) {
