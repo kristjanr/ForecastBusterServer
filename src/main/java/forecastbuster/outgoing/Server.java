@@ -5,6 +5,7 @@ import com.thoughtworks.xstream.io.xml.DomDriver;
 import forecastbuster.outgoing.entities.Forecast;
 import forecastbuster.outgoing.entities.ForecastedDay;
 import forecastbuster.outgoing.entities.Place;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.LoggerFactory;
 
 import java.io.BufferedWriter;
@@ -27,7 +28,7 @@ public class Server {
                 try {
                     query.wait();
                 } catch (InterruptedException e) {
-                    log.error(e.getMessage());
+                    log.error(ExceptionUtils.getStackTrace(e));
                 }
             }
         }
@@ -36,8 +37,21 @@ public class Server {
 
     void writeXMLFile(TreeMap<Calendar, ForecastedDay> map) {
         log.info("Starting to write XML file...");
+        String osName = System.getProperty("os.name");
+        log.info("OS name is "+osName);
+        File file;
+        String filePath;
         try {
-            File file = new File("~/", "Forecasts.xml");
+            if(osName.equalsIgnoreCase("Windows 7")){
+                filePath = "D:\\Projekt";
+                log.info("Putting the xml files into "+filePath);
+                file = new File(filePath, "Forecasts.xml");
+            }   else {
+                filePath = "/var/www";
+                log.info("Putting the xml files into "+filePath);
+                file = new File(filePath, "Forecasts.xml");
+
+            }
             if (!file.exists()) {
                 file.createNewFile();
             }
@@ -48,7 +62,7 @@ public class Server {
             log.info("Wrote XML to file " + file.getAbsoluteFile());
             out.close();
         } catch (Exception e) {
-            log.error(e.getMessage());
+            log.error(ExceptionUtils.getStackTrace(e));
         }
     }
 
