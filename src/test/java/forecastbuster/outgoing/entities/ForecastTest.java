@@ -24,11 +24,11 @@ public class ForecastTest {
         Calendar cal = Calendar.getInstance();
         cal.setTime(date);
         String nightphenomenon = "17 nov night phen";
-        double nighttempmax = 0.0;
-        double nighttempmin = -1.0;
+        Double nighttempmax = 0.0;
+        Double nighttempmin = -1.0;
         String dayphenomenon = "17 nov day phen";
-        double daytempmax = 5.0;
-        double daytempmin = 1.0;
+        Double daytempmax = 5.0;
+        Double daytempmin = 1.0;
         Object[] forecastData = {date, nightphenomenon, nighttempmax, nighttempmin, dayphenomenon, daytempmax, daytempmin
         };
 

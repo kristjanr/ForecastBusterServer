@@ -7,15 +7,20 @@ import java.util.List;
 public class Forecast {
     private Calendar date;
     private String nightPhenomenon;
-    private double nightMaxTemp;
-    private double nightMinTemp;
+    private Double nightMaxTemp;
+    private Double nightMinTemp;
     private String dayPhenomenon;
-    private double dayMaxTemp;
-    private double dayMinTemp;
+    private Double dayMaxTemp;
+    private Double dayMinTemp;
     private List<Place> places;
 
-    public Forecast(){
+    public Forecast() {
         nightPhenomenon = null;
+        nightMaxTemp = null;
+        nightMinTemp = null;
+        dayPhenomenon = null;
+        dayMaxTemp = null;
+        dayMinTemp = null;
     }
 
     public void createForecast(Object[] forecastData) {
@@ -46,11 +51,11 @@ public class Forecast {
     }
 
     public void setNightMaxTemp(double nightMaxTemp) {
-        this.nightMaxTemp = nightMaxTemp;
+        this.nightMaxTemp = (double) Math.round(nightMaxTemp * 100) / 100;
     }
 
     public void setNightMinTemp(double nightMinTemp) {
-        this.nightMinTemp = nightMinTemp;
+        this.nightMinTemp = (double) Math.round(nightMinTemp * 100) / 100;
     }
 
     private void setDayPhenomenon(Object o) {
@@ -58,11 +63,11 @@ public class Forecast {
     }
 
     public void setDayMaxTemp(double dayMaxTemp) {
-        this.dayMaxTemp = dayMaxTemp;
+        this.dayMaxTemp = (double) Math.round(dayMaxTemp * 100) / 100;
     }
 
     public void setDayMinTemp(double dayMinTemp) {
-        this.dayMinTemp = dayMinTemp;
+        this.dayMinTemp = (double) Math.round(dayMinTemp * 100) / 100;
     }
 
     public Calendar getDate() {
