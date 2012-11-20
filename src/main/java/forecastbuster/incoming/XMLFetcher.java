@@ -13,7 +13,6 @@ import org.xml.sax.InputSource;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import java.io.File;
 import java.io.StringReader;
 
 public class XMLFetcher {
@@ -37,23 +36,6 @@ public class XMLFetcher {
             e.printStackTrace();
         }
         Document doc = getDomElement(xml);
-        log.debug("Finished fetching data.");
-        return doc;
-    }
-
-    public static Document getDocFromFile(String location) {
-        Document doc = null;
-        log.debug("Starting to fetch data from file: " + location);
-        try {
-            File fXmlFile = new File(location);
-            DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-            DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-            doc = dBuilder.parse(fXmlFile);
-            doc.getDocumentElement().normalize();
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
         log.debug("Finished fetching data.");
         return doc;
     }
