@@ -3,6 +3,7 @@ package forecastbuster;
 import forecastbuster.incoming.entities.Forecast;
 import forecastbuster.incoming.entities.Observation;
 import forecastbuster.incoming.entities.Place;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -13,6 +14,8 @@ import org.hibernate.service.ServiceRegistryBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -28,19 +31,18 @@ public class DatabaseAccessObject {
 
     public void initSession() {
         Properties properties = new Properties();
-        /*
         try {
-            URL pUrl = this.getClass().getResource("config/technical/database.properties");
+            URL pUrl = this.getClass().getResource("/database.properties");
             properties.load(pUrl.openStream());
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error(ExceptionUtils.getStackTrace(e));
         }
-        */
+
         Configuration databaseConfiguration = new Configuration();
         databaseConfiguration.configure();
-        databaseConfiguration.setProperty("hibernate.connection.url", "jdbc:postgresql://localhost:5432/postgres");
-        databaseConfiguration.setProperty("hibernate.connection.username", "postgres");
-        databaseConfiguration.setProperty("hibernate.connection.password", "postgres");
+        databaseConfiguration.setProperty("hibernate.connection.url", properties.getProperty("database.url"));
+        databaseConfiguration.setProperty("hibernate.connection.username", properties.getProperty("database.user"));
+        databaseConfiguration.setProperty("hibernate.connection.password", properties.getProperty("database.password"));
         ServiceRegistry serviceRegistry = new ServiceRegistryBuilder().applySettings(databaseConfiguration.getProperties()).buildServiceRegistry();
         SessionFactory sessionFactory = databaseConfiguration.buildSessionFactory(serviceRegistry);
         hibernateSession = sessionFactory.openSession();
@@ -90,28 +92,31 @@ public class DatabaseAccessObject {
             }
         }
     }
+
     public List querySQL(String queryString, String name, Object value) {
         synchronized (sessionLockObject) {
             Query query = hibernateSession.createSQLQuery(queryString);
-            if (value!=null){
+            if (value != null) {
                 query.setParameter(name, value);
             }
             List results = query.list();
             return results;
         }
     }
+
     public List querySQL(String queryString, ArrayList parameters) {
         synchronized (sessionLockObject) {
             Query query = hibernateSession.createSQLQuery(queryString);
-            if (!parameters.isEmpty()){
-                for (int i = 0; i < parameters.size(); i++){
-                    query.setParameter(i,parameters.get(i));
+            if (!parameters.isEmpty()) {
+                for (int i = 0; i < parameters.size(); i++) {
+                    query.setParameter(i, parameters.get(i));
                 }
             }
             List results = query.list();
             return results;
         }
     }
+
     public List querySQL(String queryString) {
         synchronized (sessionLockObject) {
             Query query = hibernateSession.createSQLQuery(queryString);

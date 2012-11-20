@@ -83,10 +83,6 @@
         <finalName>ForecastBuster</finalName>
         <resources>
             <resource>
-                <targetPath>config</targetPath>
-                <directory>config</directory>
-            </resource>
-            <resource>
                 <directory>src/main/resources</directory>
             </resource>
         </resources>
