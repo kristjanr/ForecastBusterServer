@@ -9,15 +9,15 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import java.io.InputStream;
 import java.util.*;
 
-public class QueryTask extends TimerTask {
+public class QueryTaskForecast extends TimerTask {
     Query query;
     DatabaseAccessObject DAO;
     Calendar earliestDate;
     Calendar latestDate;
     ArrayList fourDayForecastQueries;
-    static org.slf4j.Logger log = LoggerFactory.getLogger(QueryTask.class);
+    static org.slf4j.Logger log = LoggerFactory.getLogger(QueryTaskForecast.class);
 
-    public QueryTask(Query query) {
+    public QueryTaskForecast(Query query) {
         this.query = query;
         DAO = query.getDatabaseAccessObject();
         fourDayForecastQueries = new ArrayList();

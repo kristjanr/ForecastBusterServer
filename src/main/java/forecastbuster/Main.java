@@ -28,16 +28,16 @@ public class Main {
     public static final String KEY_OBSERVATIONS = "observations";
     public static final String KEY_FORECAST = "forecast";
     public static int timeBetweenFetchingData = 1000 * 60 * 60;
-    public static int timeBetweenQuering = 1000 * 60 * 60 * 24;
-    static Query query;
+    public static int timeBetweenQuerying = 1000 * 60 * 60 * 24;
+    private static final Object actionLockObject = new Object();
 
     public static void main(String[] args) {
         databaseAccessObject.initSession();
+        Fetch fetch;
+        fetch = new Fetch(getDatabaseAccessObject(),actionLockObject);
 
-        Fetch fetch = new Fetch(getDatabaseAccessObject());
-
-        query = new Query();
-        query.startQuery(getDatabaseAccessObject());
+        Query query = new Query();
+        query.startForecastQuery(getDatabaseAccessObject(),actionLockObject);
 
         Server server = new Server();
         server.startServer(query);
@@ -48,9 +48,5 @@ public class Main {
             databaseAccessObject = new DatabaseAccessObject();
         }
         return databaseAccessObject;
-    }
-
-    public static Query getQuery() {
-        return query;
     }
 }

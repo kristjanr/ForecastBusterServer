@@ -3,6 +3,8 @@ package forecastbuster.incoming;
 import forecastbuster.Main;
 import forecastbuster.incoming.entities.Forecast;
 import forecastbuster.incoming.entities.Observation;
+import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -13,30 +15,35 @@ import java.util.ArrayList;
 import java.util.TimerTask;
 
 public class FetchTask extends TimerTask {
+    static org.slf4j.Logger log = LoggerFactory.getLogger(FetchTask.class);
+    Object actionLockObject;
+    public FetchTask(Object actionLockObject) {
+        this.actionLockObject = actionLockObject;
+    }
+
     public void run() {
+        synchronized (actionLockObject) {
+            Document forecastDocument = XMLFetcher.getDocFromUrl(Main.FORECAST_URL);
+            NodeList forecastNodeList = forecastDocument.getElementsByTagName(Main.KEY_FORECAST);
+            ArrayList<Forecast> forecasts = new ArrayList(8);
+            try {
+                iterateForecasts(forecastNodeList, forecasts);
+            } catch (ParseException e) {
+                log.error(ExceptionUtils.getStackTrace(e));
+            }
 
-        Document forecastDocument = XMLFetcher.getDocFromUrl(Main.FORECAST_URL);
-        //Document forecastDocument = forecastbuster.incoming.XMLFetcher.getDocFromFile(forecastbuster.Main.FORECAST_FILE);
+            Document observationDocument = XMLFetcher.getDocFromUrl(Main.OBSERVATION_URL);
+            NodeList observationNodeList = observationDocument.getElementsByTagName(Main.KEY_OBSERVATIONS);
+            Observation observation = new Observation();
 
-        NodeList forecastNodeList = forecastDocument.getElementsByTagName(Main.KEY_FORECAST);
-        ArrayList<Forecast> forecasts = new ArrayList(8);
-        try {
-            iterateForecasts(forecastNodeList, forecasts);
-        } catch (ParseException e) {
-            e.printStackTrace();
+            try {
+                observation.createObservation(observationNodeList);
+            } catch (ParseException e) {
+                log.error(ExceptionUtils.getStackTrace(e));
+            }
+            Main.getDatabaseAccessObject().saveObservationsAndSForecasts(observation, forecasts);
+            actionLockObject.notify();
         }
-
-        Document observationDocument = XMLFetcher.getDocFromUrl(Main.OBSERVATION_URL);
-        //Document observationDocument = forecastbuster.incoming.XMLFetcher.getDocFromFile(forecastbuster.Main.OBSERVATION_FILE);
-        NodeList observationNodeList = observationDocument.getElementsByTagName(Main.KEY_OBSERVATIONS);
-        Observation observation = new Observation();
-
-        try {
-            observation.createObservation(observationNodeList);
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-        Main.getDatabaseAccessObject().saveObservationsAndSForecasts(observation, forecasts);
     }
 
     void iterateForecasts(NodeList nodeList, ArrayList<Forecast> forecasts) throws ParseException {

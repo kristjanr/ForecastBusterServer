@@ -15,15 +15,15 @@ import java.util.TreeMap;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.*;
 
-public class QueryTaskTest {
+public class QueryTaskForecastTest {
     Query mockedQuery;
-    QueryTask queryTask;
+    QueryTaskForecast queryTaskForecast;
 
     @Before
     public void setUp() {
         mockedQuery = mock(Query.class);
 //        doReturn(null).when(mockedQuery).getDatabaseAccessObject();
-        queryTask = spy(new QueryTask(mockedQuery));
+        queryTaskForecast = spy(new QueryTaskForecast(mockedQuery));
     }
 
     @Test
@@ -36,7 +36,7 @@ public class QueryTaskTest {
         queryList.add(forecastDataFromQuery1);
         queryList.add(forecastDataFromQuery2);
 
-        TreeMap<Calendar, Forecast> forecastTreeMap = queryTask.createForecasts(queryList);
+        TreeMap<Calendar, Forecast> forecastTreeMap = queryTaskForecast.createForecasts(queryList);
 
         assertEquals(2, forecastTreeMap.size());
         assertEquals(date1, forecastTreeMap.firstKey().getTime());
@@ -57,17 +57,17 @@ public class QueryTaskTest {
         queryList2.add(forecastDataFromQuery2);
         List queryList3 = new ArrayList();
         queryList3.add(forecastDataFromQuery1);
-        doReturn(queryList1).when(queryTask).queryForecastsForGivenDayAfterToday(0);
-        doReturn(queryList2).when(queryTask).queryForecastsForGivenDayAfterToday(1);
-        doReturn(queryList3).when(queryTask).queryForecastsForGivenDayAfterToday(2);
-        doReturn(new ArrayList()).when(queryTask).queryForecastsForGivenDayAfterToday(3);
+        doReturn(queryList1).when(queryTaskForecast).queryForecastsForGivenDayAfterToday(0);
+        doReturn(queryList2).when(queryTaskForecast).queryForecastsForGivenDayAfterToday(1);
+        doReturn(queryList3).when(queryTaskForecast).queryForecastsForGivenDayAfterToday(2);
+        doReturn(new ArrayList()).when(queryTaskForecast).queryForecastsForGivenDayAfterToday(3);
 
-        queryTask.doQueryAndPutForecastMapsToList();
+        queryTaskForecast.doQueryAndPutForecastMapsToList();
 
-        assertEquals(date1, queryTask.earliestDate.getTime());
-        assertEquals(3, queryTask.fourDayForecastQueries.size());
-        for (int i = 0; i < queryTask.fourDayForecastQueries.size(); i++) {
-            TreeMap<Calendar, Forecast> treeMap = (TreeMap<Calendar, Forecast>) queryTask.fourDayForecastQueries.get(i);
+        assertEquals(date1, queryTaskForecast.earliestDate.getTime());
+        assertEquals(3, queryTaskForecast.fourDayForecastQueries.size());
+        for (int i = 0; i < queryTaskForecast.fourDayForecastQueries.size(); i++) {
+            TreeMap<Calendar, Forecast> treeMap = (TreeMap<Calendar, Forecast>) queryTaskForecast.fourDayForecastQueries.get(i);
             assertEquals(date1, treeMap.firstKey().getTime());
             if (i == 1) {
                 assertEquals(date2, treeMap.lastKey().getTime());
@@ -95,11 +95,11 @@ public class QueryTaskTest {
         List places = new ArrayList<Place>();
         places.add(placeData1);
         places.add(placeData2);
-        queryTask.earliestDate = cal1;
-        queryTask.latestDate = cal2;
-        doReturn(places).when(queryTask).getPlacesForecastsForTomorrow();
+        queryTaskForecast.earliestDate = cal1;
+        queryTaskForecast.latestDate = cal2;
+        doReturn(places).when(queryTaskForecast).getPlacesForecastsForTomorrow();
 
-        TreeMap<Calendar, ArrayList<Place>> placeMap = queryTask.createMapOfPlaceLists();
+        TreeMap<Calendar, ArrayList<Place>> placeMap = queryTaskForecast.createMapOfPlaceLists();
 
         assertEquals(date1, placeMap.firstKey().getTime());
         assertEquals(date2, placeMap.lastKey().getTime());
@@ -123,11 +123,11 @@ public class QueryTaskTest {
         queryList2.add(forecastDataFromQuery1);
         List queryList3 = new ArrayList();
         queryList3.add(forecastDataFromQuery1);
-        doReturn(queryList1).when(queryTask).queryForecastsForGivenDayAfterToday(0);
-        doReturn(queryList2).when(queryTask).queryForecastsForGivenDayAfterToday(1);
-        doReturn(queryList3).when(queryTask).queryForecastsForGivenDayAfterToday(2);
-        doReturn(new ArrayList()).when(queryTask).queryForecastsForGivenDayAfterToday(3);
-        queryTask.doQueryAndPutForecastMapsToList();
+        doReturn(queryList1).when(queryTaskForecast).queryForecastsForGivenDayAfterToday(0);
+        doReturn(queryList2).when(queryTaskForecast).queryForecastsForGivenDayAfterToday(1);
+        doReturn(queryList3).when(queryTaskForecast).queryForecastsForGivenDayAfterToday(2);
+        doReturn(new ArrayList()).when(queryTaskForecast).queryForecastsForGivenDayAfterToday(3);
+        queryTaskForecast.doQueryAndPutForecastMapsToList();
         Date date1 = new Date(Date.valueOf("2012-11-17").getTime());
         Date date2 = new Date(Date.valueOf("2012-11-19").getTime());
         String name1 = "Jõhvi";
@@ -141,10 +141,10 @@ public class QueryTaskTest {
         List places = new ArrayList<Place>();
         places.add(placeData1);
         places.add(placeData2);
-        doReturn(places).when(queryTask).getPlacesForecastsForTomorrow();
-        TreeMap<Calendar, ArrayList<Place>> placeMap = queryTask.createMapOfPlaceLists();
+        doReturn(places).when(queryTaskForecast).getPlacesForecastsForTomorrow();
+        TreeMap<Calendar, ArrayList<Place>> placeMap = queryTaskForecast.createMapOfPlaceLists();
 
-        TreeMap<Calendar, ForecastedDay> forecastedDayTreeMap = queryTask.createForecastedDays(placeMap);
+        TreeMap<Calendar, ForecastedDay> forecastedDayTreeMap = queryTaskForecast.createForecastedDays(placeMap);
 
         assertEquals(2,forecastedDayTreeMap.size());
         assertEquals(date3, forecastedDayTreeMap.firstKey().getTime());
