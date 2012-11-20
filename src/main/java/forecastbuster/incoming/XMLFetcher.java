@@ -1,5 +1,6 @@
 package forecastbuster.incoming;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;
@@ -9,13 +10,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
-import java.io.IOException;
 import java.io.StringReader;
 
 public class XMLFetcher {
@@ -71,14 +69,8 @@ public class XMLFetcher {
             is.setCharacterStream(new StringReader(xml));
             doc = documentBuilder.parse(is);
 
-        } catch (ParserConfigurationException e) {
-            log.error("Error: ", e.getMessage());
-            return null;
-        } catch (SAXException e) {
-            log.error("Error: ", e.getMessage());
-            return null;
-        } catch (IOException e) {
-            log.error("Error: ", e.getMessage());
+        } catch (Exception e) {
+            log.error(ExceptionUtils.getStackTrace(e));
             return null;
         }
         return doc;
