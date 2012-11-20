@@ -18,9 +18,6 @@ public class Server {
     static org.slf4j.Logger log = LoggerFactory.getLogger(Server.class);
     Query query;
 
-    public Server() {
-    }
-
     public void startServer(Query query) {
         this.query = query;
         synchronized (query) {
@@ -74,20 +71,20 @@ public class Server {
         xstream.alias("place", Place.class);
         xstream.alias("weatherforecasthistory", Query.class);
         xstream.aliasField("date", ForecastedDay.class, "dateString");
-        xstream.aliasField("onedaybefore", ForecastedDay.class, "forecasted1DayBefore");
-        xstream.aliasField("twodaysbefore", ForecastedDay.class, "forecasted2DaysBefore");
-        xstream.aliasField("threedaysbefore", ForecastedDay.class, "forecasted3DaysBefore");
-        xstream.aliasField("fourdaysbefore", ForecastedDay.class, "forecasted4DaysBefore");
-        xstream.aliasField("nightphenomenon", Forecast.class, "nightPhenomenon");
-        xstream.aliasField("nightmaxtemp", Forecast.class, "nightMaxTemp");
-        xstream.aliasField("nightmintemp", Forecast.class, "nightMinTemp");
-        xstream.aliasField("dayphenomenon", Forecast.class, "dayPhenomenon");
-        xstream.aliasField("daymaxtemp", Forecast.class, "dayMaxTemp");
-        xstream.aliasField("daymintemp", Forecast.class, "dayMinTemp");
-        xstream.aliasField("daymaxtemp", Place.class, "dayMaxTemp");
-        xstream.aliasField("nightmintemp", Place.class, "nightMinTemp");
-        xstream.aliasField("nightphenomenon", Place.class, "nightPhenomenon");
-        xstream.aliasField("dayphenomenon", Place.class, "dayPhenomenon");
+        xstream.aliasField("oneB4", ForecastedDay.class, "forecasted1DayBefore");
+        xstream.aliasField("twoB4", ForecastedDay.class, "forecasted2DaysBefore");
+        xstream.aliasField("threeB4", ForecastedDay.class, "forecasted3DaysBefore");
+        xstream.aliasField("fourB4", ForecastedDay.class, "forecasted4DaysBefore");
+        xstream.aliasField("nphen", Forecast.class, "nightPhenomenon");
+        xstream.aliasField("nmaxt", Forecast.class, "nightMaxTemp");
+        xstream.aliasField("nmint", Forecast.class, "nightMinTemp");
+        xstream.aliasField("dphen", Forecast.class, "dayPhenomenon");
+        xstream.aliasField("dmaxt", Forecast.class, "dayMaxTemp");
+        xstream.aliasField("dmint", Forecast.class, "dayMinTemp");
+        xstream.aliasField("dmaxt", Place.class, "dayMaxTemp");
+        xstream.aliasField("nmint", Place.class, "nightMinTemp");
+        xstream.aliasField("nphen", Place.class, "nightPhenomenon");
+        xstream.aliasField("dphen", Place.class, "dayPhenomenon");
         xstream.aliasField("", Forecast.class, "");
         xstream.omitField(ForecastedDay.class, "date");
         xstream.omitField(Forecast.class, "date");
