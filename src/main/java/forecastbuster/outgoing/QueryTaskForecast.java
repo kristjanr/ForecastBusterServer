@@ -4,9 +4,9 @@ import forecastbuster.DatabaseAccessObject;
 import forecastbuster.outgoing.entities.Forecast;
 import forecastbuster.outgoing.entities.ForecastedDay;
 import forecastbuster.outgoing.entities.Place;
-import org.slf4j.LoggerFactory;
 import org.apache.commons.lang3.exception.ExceptionUtils;
-import java.io.InputStream;
+import org.slf4j.LoggerFactory;
+
 import java.util.*;
 
 public class QueryTaskForecast extends TimerTask {
@@ -159,7 +159,7 @@ public class QueryTaskForecast extends TimerTask {
      * @return The list of objects arrays (Object[]) containing data of places forecasts with all possible days. There are 6 places for each day. The forecasts for places are made only 1 day before teh subject date.     *
      */
     List getPlacesForecastsForTomorrow() {
-        String queryString = getSqlString("place.sql");
+        String queryString = query.getSqlString("place.sql");
         List queryList = new ArrayList();
         try {
             queryList = DAO.querySQL(queryString);
@@ -176,24 +176,13 @@ public class QueryTaskForecast extends TimerTask {
      * @return The list of objects arrays (Object[]) containing data of forecasts with all possible days which were made on the given day before. There are one forecast for each day.
      */
     List queryForecastsForGivenDayAfterToday(int daysAfterToday) {
-        String queryString = getSqlString("forecast.sql");
+        String queryString = query.getSqlString("forecast.sql");
         List queryList = new ArrayList();
         try {
             queryList = DAO.querySQL(queryString, "daysAfterToday", daysAfterToday);
         } catch (Exception e) {
             log.error(ExceptionUtils.getStackTrace(e));
         }
-        return queryList;
-    }
+        return queryList;    }
 
-    private String getSqlString(String sqlFileName) {
-        InputStream inputStream = this.getClass().getResourceAsStream("/" + sqlFileName);
-        String theString = convertStreamToString(inputStream);
-        return theString;
-    }
-
-    public static String convertStreamToString(InputStream is) {
-        Scanner s = new Scanner(is).useDelimiter("\\A");
-        return s.hasNext() ? s.next() : "";
-    }
 }

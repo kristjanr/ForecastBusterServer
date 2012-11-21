@@ -3,10 +3,11 @@ package forecastbuster.outgoing;
 import forecastbuster.DatabaseAccessObject;
 import forecastbuster.Main;
 import forecastbuster.outgoing.entities.ForecastedDay;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.LoggerFactory;
 
+import java.io.InputStream;
 import java.util.Calendar;
+import java.util.Scanner;
 import java.util.Timer;
 import java.util.TreeMap;
 
@@ -22,14 +23,12 @@ public class Query {
     public void startForecastQuery(DatabaseAccessObject databaseAccessObject, Object actionLockObject) {
         this.databaseAccessObject = databaseAccessObject;
         synchronized (actionLockObject){
-            try {
-                actionLockObject.wait();
-            } catch (InterruptedException e) {
-                log.error(ExceptionUtils.getStackTrace(e));
-            }
+
             Timer queryTimer = new Timer("queryTimer");
             QueryTaskForecast queryTaskForecast = new QueryTaskForecast(this);
             queryTimer.schedule(queryTaskForecast, 0, Main.timeBetweenQuerying);
+            QueryTaskObservation queryTaskObservation = new QueryTaskObservation(this);
+            queryTimer.schedule(queryTaskObservation, 0, Main.timeBetweenQuerying);
         }
     }
 
@@ -43,5 +42,16 @@ public class Query {
 
     public void setForecastDays(TreeMap<Calendar, ForecastedDay> forecastDays) {
         this.forecastDays = forecastDays;
+    }
+
+    String getSqlString(String sqlFileName) {
+        InputStream inputStream = this.getClass().getResourceAsStream("/" + sqlFileName);
+        String theString = convertStreamToString(inputStream);
+        return theString;
+    }
+
+    public String convertStreamToString(InputStream is) {
+        Scanner s = new Scanner(is).useDelimiter("\\A");
+        return s.hasNext() ? s.next() : "";
     }
 }
