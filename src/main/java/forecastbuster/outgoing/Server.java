@@ -2,8 +2,10 @@ package forecastbuster.outgoing;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
+import forecastbuster.Main;
 import forecastbuster.outgoing.entities.Forecast;
 import forecastbuster.outgoing.entities.ForecastedDay;
+import forecastbuster.outgoing.entities.Observation;
 import forecastbuster.outgoing.entities.Place;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.LoggerFactory;
@@ -11,59 +13,80 @@ import org.slf4j.LoggerFactory;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
-import java.util.Calendar;
-import java.util.TreeMap;
+import java.io.IOException;
 
 public class Server {
     static org.slf4j.Logger log = LoggerFactory.getLogger(Server.class);
     Query query;
 
-    public void startServer(Query query) {
+    public void startServer(Query query) throws IOException {
         this.query = query;
-        synchronized (query) {
-            while (query.getForecastDays().isEmpty()) {
+
+        synchronized (Main.observationQueryLockObject) {
+            while (query.getObservations().isEmpty()) {
                 try {
-                    query.wait();
+                    Main.observationQueryLockObject.wait();
                 } catch (InterruptedException e) {
                     log.error(ExceptionUtils.getStackTrace(e));
                 }
             }
         }
-        writeXMLFile(query.getForecastDays());
+        log.info("Starting to write XML files...");
+        XStream observationFormat = XMLFormatForObservation();
+        String observationXML = createXMLString(observationFormat, query);
+        writeFile(observationXML, Main.OBSERVATION_FILENAME_OUT);
+
+        synchronized (Main.forecastQueryLockObject) {
+            while (query.getForecastDays().isEmpty()) {
+                try {
+                    Main.forecastQueryLockObject.wait();
+                } catch (InterruptedException e) {
+                    log.error(ExceptionUtils.getStackTrace(e));
+                }
+            }
+        }
+
+        XStream forecastFormat = XMLFormatForForecast();
+        String forecastXML = createXMLString(forecastFormat, query);
+        writeFile(forecastXML, Main.FORECAST_FILENAME_OUT);
     }
 
-    void writeXMLFile(TreeMap<Calendar, ForecastedDay> map) {
-        log.info("Starting to write XML file...");
-        String osName = System.getProperty("os.name");
-        log.info("OS name is "+osName);
+    private void writeFile(String xml, String filename) throws IOException {
         File file;
         String filePath;
+        String osName = System.getProperty("os.name");
+        log.info("OS name is " + osName);
+        FileWriter fstream = null;
         try {
-            if(osName.equalsIgnoreCase("Windows 7")){
+            if (osName.equalsIgnoreCase("Windows 7")) {
                 filePath = "D:\\Projekt";
-                log.info("Putting the xml files into "+filePath);
-                file = new File(filePath, "Forecasts.xml");
-            }   else {
+                log.info("Putting the " + filename + " file into " + filePath);
+                file = new File(filePath, filename);
+            } else {
                 filePath = "/var/www";
-                log.info("Putting the xml files into "+filePath);
-                file = new File(filePath, "Forecasts.xml");
+                log.info("Putting the " + filename + " file into " + filePath);
+                file = new File(filePath, filename);
 
             }
             if (!file.exists()) {
-                file.createNewFile();
+                boolean newFile = file.createNewFile();
             }
-            FileWriter fstream = new FileWriter(file.getAbsoluteFile());
-            BufferedWriter out = new BufferedWriter(fstream);
-            String xmlText = createXMLString(query);
-            out.write(xmlText);
-            log.info("Wrote XML to file " + file.getAbsoluteFile());
-            out.close();
+            fstream = new FileWriter(file.getAbsoluteFile());
         } catch (Exception e) {
             log.error(ExceptionUtils.getStackTrace(e));
         }
+        BufferedWriter out = new BufferedWriter(fstream);
+        out.write(xml);
+        out.close();
     }
 
-    private String createXMLString(Query query) {
+    private String createXMLString(XStream xstream, Query query) {
+        String xmlString = xstream.toXML(query);
+        return xmlString;
+    }
+
+
+    private XStream XMLFormatForForecast() {
         XStream xstream = new XStream(new DomDriver());
         xstream.useAttributeFor(ForecastedDay.class, "dateString");
         xstream.useAttributeFor(Place.class, "name");
@@ -90,8 +113,13 @@ public class Server {
         xstream.omitField(Forecast.class, "date");
         xstream.omitField(Place.class, "date");
         xstream.addImplicitMap(Query.class, "forecastDays", ForecastedDay.class, "date");
-        String xmlString = xstream.toXML(query);
-        return xmlString;
+        return xstream;
+    }
+
+    private XStream XMLFormatForObservation() {
+        XStream xstream = new XStream(new DomDriver());
+        xstream.addImplicitMap(Query.class, "observations", Observation.class, "date");
+        return xstream;
     }
 }
 

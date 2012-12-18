@@ -1,8 +1,9 @@
 package forecastbuster;
 
-import forecastbuster.incoming.Fetch;
 import forecastbuster.outgoing.Query;
 import forecastbuster.outgoing.Server;
+
+import java.io.IOException;
 
 public class Main {
     public static DatabaseAccessObject databaseAccessObject = new DatabaseAccessObject();
@@ -29,15 +30,18 @@ public class Main {
     public static final String KEY_FORECAST = "forecast";
     public static int timeBetweenFetchingData = 1000 * 60 * 60;
     public static int timeBetweenQuerying = 1000 * 60 * 60 * 24;
-    private static final Object actionLockObject = new Object();
+    public static final Object actionLockObject = new Object();
+    public static final Object forecastQueryLockObject = new Object();
+    public static final Object observationQueryLockObject = new Object();
+    public static final String FORECAST_FILENAME_OUT = "Forecast.xml";
+    public static final String OBSERVATION_FILENAME_OUT = "Observation.xml";
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         databaseAccessObject.initSession();
-        Fetch fetch;
-        fetch = new Fetch(getDatabaseAccessObject(),actionLockObject);
+        Fetch fetch = new Fetch(getDatabaseAccessObject());
 
         Query query = new Query();
-        query.startForecastQuery(getDatabaseAccessObject(),actionLockObject);
+        query.start(getDatabaseAccessObject());
 
         Server server = new Server();
         server.startServer(query);

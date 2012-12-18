@@ -1,6 +1,7 @@
 package forecastbuster.outgoing;
 
 import forecastbuster.DatabaseAccessObject;
+import forecastbuster.Main;
 import forecastbuster.outgoing.entities.Forecast;
 import forecastbuster.outgoing.entities.ForecastedDay;
 import forecastbuster.outgoing.entities.Place;
@@ -19,7 +20,7 @@ public class QueryTaskForecast extends TimerTask {
 
     public QueryTaskForecast(Query query) {
         this.query = query;
-        DAO = query.getDatabaseAccessObject();
+        DAO = Query.getDatabaseAccessObject();
         fourDayForecastQueries = new ArrayList();
         earliestDate = Calendar.getInstance();
         latestDate = Calendar.getInstance();
@@ -29,10 +30,10 @@ public class QueryTaskForecast extends TimerTask {
     @Override
     public void run() {
         TreeMap<Calendar, ForecastedDay> forecastDays = createForecastedDaysFromQueries();
-        synchronized (query) {
+        synchronized (Main.forecastQueryLockObject) {
             query.setForecastDays(forecastDays);
-            log.debug("Created entities from queries. The size of the TreeMap is " + forecastDays.size());
-            query.notify();
+            log.debug("Created forecastdays entities from queries. The size of the TreeMap is " + forecastDays.size());
+            Main.forecastQueryLockObject.notify();
         }
     }
 

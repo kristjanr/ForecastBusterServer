@@ -16,16 +16,14 @@ import java.util.TimerTask;
 
 public class FetchTask extends TimerTask {
     static org.slf4j.Logger log = LoggerFactory.getLogger(FetchTask.class);
-    Object actionLockObject;
-    public FetchTask(Object actionLockObject) {
-        this.actionLockObject = actionLockObject;
+    public FetchTask() {
     }
 
     public void run() {
-        synchronized (actionLockObject) {
+        synchronized (Main.actionLockObject) {
             Document forecastDocument = XMLFetcher.getDocFromUrl(Main.FORECAST_URL);
             NodeList forecastNodeList = forecastDocument.getElementsByTagName(Main.KEY_FORECAST);
-            ArrayList<Forecast> forecasts = new ArrayList(8);
+            ArrayList<Forecast> forecasts = new ArrayList<Forecast>(8);
             try {
                 iterateForecasts(forecastNodeList, forecasts);
             } catch (ParseException e) {
@@ -42,7 +40,7 @@ public class FetchTask extends TimerTask {
                 log.error(ExceptionUtils.getStackTrace(e));
             }
             Main.getDatabaseAccessObject().saveObservationsAndSForecasts(observation, forecasts);
-            actionLockObject.notify();
+            Main.actionLockObject.notify();
         }
     }
 

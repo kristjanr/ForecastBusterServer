@@ -1,4 +1,4 @@
-SELECT p.name, p.date, p.phen, t.temp
+SELECT p.date, p.name, p.phen, t.temp
 FROM
 ( SELECT sub1.name AS name, sub1.phenomenon AS phen, sub1.obsdate AS date
 	FROM 

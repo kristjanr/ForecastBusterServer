@@ -9,10 +9,10 @@ import static forecastbuster.Main.timeBetweenFetchingData;
 public class Fetch {
     DatabaseAccessObject databaseAccessObject;
 
-    public Fetch(DatabaseAccessObject databaseAccessObject, Object actionLockObject) {
+    public Fetch(DatabaseAccessObject databaseAccessObject ) {
         this.databaseAccessObject = databaseAccessObject;
         Timer fetchTimer = new Timer("fetchTimer");
-        FetchTask dataFetchTask = new FetchTask(actionLockObject);
+        FetchTask dataFetchTask = new FetchTask();
         fetchTimer.schedule(dataFetchTask, 0, timeBetweenFetchingData);
     }
 }

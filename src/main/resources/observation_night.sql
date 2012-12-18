@@ -1,10 +1,10 @@
-SELECT p.name, p.date, p.phen, t.temp
+SELECT p.date, p.name, p.phen, t.temp
 FROM
 ( SELECT sub1.name AS name, sub1.phenomenon AS phen, sub1.obsdate AS date
 	FROM 
 	(SELECT name, phenomenon, CAST(("timestamp"+interval '3 hours')AS date) AS obsdate, count(*) as cnnt
 		FROM station, observation
-		WHERE station.observationid=observation.observationid
+		WHERE station.observationid = observation.observationid
 			AND CAST(("timestamp"+interval '3 hours') AS time) between CAST('00:00:00' AS time) AND CAST ('08:00:00' AS time)
 		GROUP BY name, phenomenon, obsdate
 	) AS sub1 
