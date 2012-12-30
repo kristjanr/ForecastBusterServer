@@ -32,15 +32,13 @@ public class Main {
     public static int timeBetweenFetchingData = 1000 * 60 * 60;
     public static int timeBetweenQuerying = 1000 * 60 * 60 * 24;
     public static final Object actionLockObject = new Object();
-    public static final Object forecastQueryLockObject = new Object();
-    public static final Object observationQueryLockObject = new Object();
     public static final String FORECAST_FILENAME_OUT = "Forecast.xml";
     public static final String OBSERVATION_FILENAME_OUT = "Observation.xml";
 
     public static void main(String[] args) throws IOException {
         getDatabaseAccessObject().initSession();
-        //Fetch fetch = new Fetch(getDatabaseAccessObject());
-
+        Fetch fetch = new Fetch();
+        fetch.start();
         Query query = new Query();
         query.start();
     }

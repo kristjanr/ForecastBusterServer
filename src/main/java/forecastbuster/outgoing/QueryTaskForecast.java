@@ -21,27 +21,24 @@ public class QueryTaskForecast extends TimerTask {
     Server server;
 
     public QueryTaskForecast(Query query) {
-        server = new Server();
         this.query = query;
         DAO = Main.getDatabaseAccessObject();
         fourDayForecastQueries = new ArrayList();
         earliestDate = Calendar.getInstance();
         latestDate = Calendar.getInstance();
         latestDate.setTimeInMillis(0);
+        server = new Server();
     }
 
     @Override
     public void run() {
         TreeMap<Calendar, ForecastedDay> forecastDays = createForecastedDaysFromQueries();
-        synchronized (Main.forecastQueryLockObject) {
-            query.setForecastDays(forecastDays);
-            log.info("Created forecastdays entities from queries. The size of the TreeMap is " + forecastDays.size());
-            Main.forecastQueryLockObject.notify();
-            try {
-                server.parseForecastsToXML(query);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+        query.setForecastDays(forecastDays);
+        log.info("Created forecastdays entities from queries. The size of the TreeMap is " + forecastDays.size());
+        try {
+            server.parseForecastsToXML(query);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
@@ -55,7 +52,7 @@ public class QueryTaskForecast extends TimerTask {
 
         for (int i = 0; i < 4; i++) {
             List forecastsForGivenDayAfterTomorrow = queryForecastsForGivenDayAfterToday(i);
-            log.debug("Did the "+(i+1)+"-st query from database. The size of the list is "+forecastsForGivenDayAfterTomorrow.size());
+            log.debug("Did the " + (i + 1) + "-st query from database. The size of the list is " + forecastsForGivenDayAfterTomorrow.size());
             TreeMap<Calendar, Forecast> forecastsFromQuery = createForecasts(forecastsForGivenDayAfterTomorrow);
             if (!forecastsFromQuery.isEmpty()) {
                 fourDayForecastQueries.add(forecastsFromQuery);
@@ -73,26 +70,26 @@ public class QueryTaskForecast extends TimerTask {
 
         TreeMap<Calendar, Forecast> forecastTreeMap = new TreeMap<Calendar, Forecast>(new MyDateComparator());
         log.debug("Starting try, while cycle in createForecasts.");
-        Object[] forecastData =null;
-        try{
+        Object[] forecastData = null;
+        try {
             while (!list.isEmpty()) {
                 Forecast forecast = new Forecast();
                 forecastData = (Object[]) list.remove(0);
                 forecast.createForecast(forecastData);
                 forecastTreeMap.put((Calendar) forecast.getDate().clone(), forecast);
-                log.debug("Put a forecast with the date "+forecast.getDate().getTime()+ " in a TreeMap");
+                log.debug("Put a forecast with the date " + forecast.getDate().getTime() + " in a TreeMap");
             }
-        } catch (Exception e){
+        } catch (Exception e) {
             log.error(ExceptionUtils.getStackTrace(e));
 
-            log.error("Failed to create forecast from query with this data : "+Arrays.toString(forecastData));
+            log.error("Failed to create forecast from query with this data : " + Arrays.toString(forecastData));
         }
         return forecastTreeMap;
     }
 
     TreeMap<Calendar, ArrayList<Place>> createMapOfPlaceLists() {
         List placesDataFromQueries = getPlacesForecastsForTomorrow();
-        log.debug("The size of places query from database is "+placesDataFromQueries.size());
+        log.debug("The size of places query from database is " + placesDataFromQueries.size());
         ArrayList<Place> places;
         places = getPlacesFromObjectArrays(placesDataFromQueries);
 
@@ -192,6 +189,7 @@ public class QueryTaskForecast extends TimerTask {
         } catch (Exception e) {
             log.error(ExceptionUtils.getStackTrace(e));
         }
-        return queryList;    }
+        return queryList;
+    }
 
 }

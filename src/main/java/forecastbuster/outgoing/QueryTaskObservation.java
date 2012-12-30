@@ -36,16 +36,13 @@ public class QueryTaskObservation extends TimerTask {
         nightTempStations = createTempStations(nighQueryList);
         if (!nightTempStations.isEmpty() && !dayTempStations.isEmpty()) {
             TreeMap<Calendar, Observation> observations;
-            synchronized (Main.observationQueryLockObject) {
-                observations = createObservations(nightTempStations, dayTempStations);
-                log.info("Created observation entities from queries. The size of the TreeMap is " + observations.size());
-                query.setObservations(observations);
-                Main.observationQueryLockObject.notify();
-                try {
-                    server.parseObservationsToXML(query);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+            observations = createObservations(nightTempStations, dayTempStations);
+            log.info("Created observation entities from queries. The size of the TreeMap is " + observations.size());
+            query.setObservations(observations);
+            try {
+                server.parseObservationsToXML(query);
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         }
     }
@@ -65,23 +62,22 @@ public class QueryTaskObservation extends TimerTask {
     private ArrayList<Station> createStationsWithOneDate(ArrayList<TempStation> nightTempStations, ArrayList<TempStation> dayTempStations) {
         ArrayList<Station> stations = new ArrayList<Station>();
         int dayPhenCount = 0;
-        if (nightTempStations != null && dayTempStations != null){
-        for (TempStation dayTempStation : dayTempStations) {
-            Station station = new Station();
-            station.setName(dayTempStation.getName());
-            station.setNightPhenomenon(dayTempStation.getPhenomenon());
-            station.setNightTemp(dayTempStation.getTemp());
-            for (TempStation nightTempStation : nightTempStations) {
-                if (dayTempStation.getName().equals(nightTempStation.getName())) {
-                    station.setDayPhenomenon(nightTempStation.getPhenomenon());
-                    station.setDayTemp(nightTempStation.getTemp());
+        if (nightTempStations != null && dayTempStations != null) {
+            for (TempStation dayTempStation : dayTempStations) {
+                Station station = new Station();
+                station.setName(dayTempStation.getName());
+                station.setDayPhenomenon(dayTempStation.getPhenomenon());
+                station.setDayTemp(dayTempStation.getTemp());
+                for (TempStation nightTempStation : nightTempStations) {
+                    if (dayTempStation.getName().equals(nightTempStation.getName())) {
+                        station.setNightPhenomenon(nightTempStation.getPhenomenon());
+                        station.setNightTemp(nightTempStation.getTemp());
+                    }
                 }
+                stations.add(station);
             }
-            stations.add(station);
-        }
-        return stations;
-        }
-        else {
+            return stations;
+        } else {
             log.debug("could not create station list with because either day or night station lists (or both) are empty");
             return null;
         }
