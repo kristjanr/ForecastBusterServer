@@ -57,4 +57,4 @@ SELECT dp.fdate as fdate, np.phen AS nightphen, nt.tempmax AS nighttempmax, nt.t
 		GROUP BY date
 	) nt
 	WHERE dp.fdate = np.fdate AND dt.date = dp.fdate AND nt.date = dp.fdate
-	ORDER BY dp.fdate;
+	;

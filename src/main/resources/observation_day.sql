@@ -29,4 +29,4 @@ FROM
 		GROUP BY name, date	
 	) AS t
 WHERE p.name=t.name AND p.date=t.date
-ORDER BY date, name
+;
