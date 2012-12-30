@@ -3,10 +3,7 @@ package forecastbuster.outgoing;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
 import forecastbuster.Main;
-import forecastbuster.outgoing.entities.Forecast;
-import forecastbuster.outgoing.entities.ForecastedDay;
-import forecastbuster.outgoing.entities.Observation;
-import forecastbuster.outgoing.entities.Place;
+import forecastbuster.outgoing.entities.*;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.LoggerFactory;
 
@@ -67,38 +64,50 @@ public class Server {
 
     private XStream XMLFormatForForecast() {
         XStream xstream = new XStream(new DomDriver());
+        xstream.addImplicitMap(Query.class, "forecastDays", ForecastedDay.class, "date");
+        xstream.omitField(Query.class, "observations");
         xstream.useAttributeFor(ForecastedDay.class, "dateString");
         xstream.useAttributeFor(Place.class, "name");
         xstream.alias("day", ForecastedDay.class);
         xstream.alias("place", Place.class);
-        xstream.alias("weatherforecasthistory", Query.class);
+        xstream.alias("forecasts", Query.class);
         xstream.aliasField("date", ForecastedDay.class, "dateString");
         xstream.aliasField("oneB4", ForecastedDay.class, "forecasted1DayBefore");
         xstream.aliasField("twoB4", ForecastedDay.class, "forecasted2DaysBefore");
         xstream.aliasField("threeB4", ForecastedDay.class, "forecasted3DaysBefore");
         xstream.aliasField("fourB4", ForecastedDay.class, "forecasted4DaysBefore");
-        xstream.aliasField("nphen", Forecast.class, "nightPhenomenon");
+        xstream.aliasField("np", Forecast.class, "nightPhenomenon");
         xstream.aliasField("nmaxt", Forecast.class, "nightMaxTemp");
         xstream.aliasField("nmint", Forecast.class, "nightMinTemp");
-        xstream.aliasField("dphen", Forecast.class, "dayPhenomenon");
+        xstream.aliasField("dp", Forecast.class, "dayPhenomenon");
         xstream.aliasField("dmaxt", Forecast.class, "dayMaxTemp");
         xstream.aliasField("dmint", Forecast.class, "dayMinTemp");
         xstream.aliasField("dmaxt", Place.class, "dayMaxTemp");
         xstream.aliasField("nmint", Place.class, "nightMinTemp");
-        xstream.aliasField("nphen", Place.class, "nightPhenomenon");
-        xstream.aliasField("dphen", Place.class, "dayPhenomenon");
+        xstream.aliasField("np", Place.class, "nightPhenomenon");
+        xstream.aliasField("dp", Place.class, "dayPhenomenon");
         xstream.aliasField("", Forecast.class, "");
         xstream.omitField(ForecastedDay.class, "date");
         xstream.omitField(Forecast.class, "date");
         xstream.omitField(Place.class, "date");
-        xstream.addImplicitMap(Query.class, "forecastDays", ForecastedDay.class, "date");
-        xstream.omitField(Query.class, "observations");
         return xstream;
     }
 
     private XStream XMLFormatForObservation() {
         XStream xstream = new XStream(new DomDriver());
         xstream.addImplicitMap(Query.class, "observations", Observation.class, "date");
+        xstream.omitField(Query.class,"forecastDays");
+        xstream.useAttributeFor(Observation.class, "dateString");
+        xstream.aliasField("date", Observation.class, "dateString");
+        xstream.useAttributeFor(Station.class,"name");
+        xstream.alias("day", Observation.class);
+        xstream.alias("station", Station.class);
+        xstream.alias("observations", Query.class);
+        xstream.omitField(Observation.class,"date");
+        xstream.aliasField("dt", Station.class, "dayTemp");
+        xstream.aliasField("nt", Station.class, "nightTemp");
+        xstream.aliasField("np", Station.class, "nightPhenomenon");
+        xstream.aliasField("dp", Station.class, "dayPhenomenon");
         return xstream;
     }
 }
