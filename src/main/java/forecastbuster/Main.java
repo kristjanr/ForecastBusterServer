@@ -1,12 +1,13 @@
 package forecastbuster;
 
+import forecastbuster.incoming.Fetch;
 import forecastbuster.outgoing.Query;
 import forecastbuster.outgoing.Server;
 
 import java.io.IOException;
 
 public class Main {
-    public static DatabaseAccessObject databaseAccessObject = new DatabaseAccessObject();
+    public static DatabaseAccessObject databaseAccessObject;
     public static final String FORECAST_URL = "http://www.emhi.ee/ilma_andmed/xml/forecast.php";
     public static final String FORECAST_FILE = "D:\\Projekt\\ForecastBusterServer\\forecast.xml";
     public static final String OBSERVATION_URL = "http://www.emhi.ee/ilma_andmed/xml/observations.php";
@@ -37,14 +38,11 @@ public class Main {
     public static final String OBSERVATION_FILENAME_OUT = "Observation.xml";
 
     public static void main(String[] args) throws IOException {
-        databaseAccessObject.initSession();
-        Fetch fetch = new Fetch(getDatabaseAccessObject());
+        getDatabaseAccessObject().initSession();
+        //Fetch fetch = new Fetch(getDatabaseAccessObject());
 
         Query query = new Query();
-        query.start(getDatabaseAccessObject());
-
-        Server server = new Server();
-        server.startServer(query);
+        query.start();
     }
 
     public static DatabaseAccessObject getDatabaseAccessObject() {

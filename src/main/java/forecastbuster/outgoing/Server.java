@@ -17,38 +17,17 @@ import java.io.IOException;
 
 public class Server {
     static org.slf4j.Logger log = LoggerFactory.getLogger(Server.class);
-    Query query;
 
-    public void startServer(Query query) throws IOException {
-        this.query = query;
-
-        synchronized (Main.observationQueryLockObject) {
-            while (query.getObservations().isEmpty()) {
-                try {
-                    Main.observationQueryLockObject.wait();
-                } catch (InterruptedException e) {
-                    log.error(ExceptionUtils.getStackTrace(e));
-                }
-            }
-        }
-        log.info("Starting to write XML files...");
-        XStream observationFormat = XMLFormatForObservation();
-        String observationXML = createXMLString(observationFormat, query);
-        writeFile(observationXML, Main.OBSERVATION_FILENAME_OUT);
-
-        synchronized (Main.forecastQueryLockObject) {
-            while (query.getForecastDays().isEmpty()) {
-                try {
-                    Main.forecastQueryLockObject.wait();
-                } catch (InterruptedException e) {
-                    log.error(ExceptionUtils.getStackTrace(e));
-                }
-            }
-        }
-
+    public void parseForecastsToXML(Query query) throws IOException {
         XStream forecastFormat = XMLFormatForForecast();
-        String forecastXML = createXMLString(forecastFormat, query);
-        writeFile(forecastXML, Main.FORECAST_FILENAME_OUT);
+        String xmlString = forecastFormat.toXML(query);
+        writeFile(xmlString, Main.FORECAST_FILENAME_OUT);
+    }
+
+    public void parseObservationsToXML(Query query) throws IOException {
+        XStream observationFormat = XMLFormatForObservation();
+        String xmlString = observationFormat.toXML(query);
+        writeFile(xmlString, Main.OBSERVATION_FILENAME_OUT);
     }
 
     private void writeFile(String xml, String filename) throws IOException {
@@ -113,6 +92,7 @@ public class Server {
         xstream.omitField(Forecast.class, "date");
         xstream.omitField(Place.class, "date");
         xstream.addImplicitMap(Query.class, "forecastDays", ForecastedDay.class, "date");
+        xstream.omitField(Query.class, "observations");
         return xstream;
     }
 

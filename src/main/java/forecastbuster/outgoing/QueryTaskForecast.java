@@ -8,6 +8,7 @@ import forecastbuster.outgoing.entities.Place;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.util.*;
 
 public class QueryTaskForecast extends TimerTask {
@@ -17,10 +18,12 @@ public class QueryTaskForecast extends TimerTask {
     Calendar latestDate;
     ArrayList fourDayForecastQueries;
     static org.slf4j.Logger log = LoggerFactory.getLogger(QueryTaskForecast.class);
+    Server server;
 
     public QueryTaskForecast(Query query) {
+        server = new Server();
         this.query = query;
-        DAO = Query.getDatabaseAccessObject();
+        DAO = Main.getDatabaseAccessObject();
         fourDayForecastQueries = new ArrayList();
         earliestDate = Calendar.getInstance();
         latestDate = Calendar.getInstance();
@@ -32,8 +35,13 @@ public class QueryTaskForecast extends TimerTask {
         TreeMap<Calendar, ForecastedDay> forecastDays = createForecastedDaysFromQueries();
         synchronized (Main.forecastQueryLockObject) {
             query.setForecastDays(forecastDays);
-            log.debug("Created forecastdays entities from queries. The size of the TreeMap is " + forecastDays.size());
+            log.info("Created forecastdays entities from queries. The size of the TreeMap is " + forecastDays.size());
             Main.forecastQueryLockObject.notify();
+            try {
+                server.parseForecastsToXML(query);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 

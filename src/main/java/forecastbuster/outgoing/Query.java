@@ -13,7 +13,7 @@ import java.util.Timer;
 import java.util.TreeMap;
 
 public class Query {
-    private static DatabaseAccessObject databaseAccessObject;
+
     private TreeMap<Calendar, ForecastedDay> forecastDays;
     static org.slf4j.Logger log = LoggerFactory.getLogger(Query.class);
     private TreeMap<Calendar, Observation> observations;
@@ -23,28 +23,25 @@ public class Query {
         observations = new TreeMap<Calendar, Observation>();
     }
 
-    public void start(DatabaseAccessObject databaseAccessObject) {
-        Query.databaseAccessObject = databaseAccessObject;
-        synchronized (Main.actionLockObject){
-            Timer queryTimer = new Timer("queryTimer");
-            startForecastQuery(queryTimer);
-            Timer queryTimer2 = new Timer("queryTimer2");
-            startObservationQuery(queryTimer2);
+    public void start() {
+        synchronized (Main.actionLockObject) {
+            startForecastQuery();
+            startObservationQuery();
         }
     }
 
-    private void startForecastQuery(Timer queryTimer) {
+    private void startForecastQuery() {
+        Timer queryTimer = new Timer("queryTimer");
+        log.info("Started FORECAST queries");
         QueryTaskForecast queryTaskForecast = new QueryTaskForecast(this);
         queryTimer.schedule(queryTaskForecast, 0, Main.timeBetweenQuerying);
     }
 
-    private void startObservationQuery(Timer queryTimer) {
+    private void startObservationQuery() {
+        Timer queryTimer2 = new Timer("queryTimer2");
+        log.info("Started OBSERVATION queries");
         QueryTaskObservation queryTaskObservation = new QueryTaskObservation(this);
-        queryTimer.schedule(queryTaskObservation, 0, Main.timeBetweenQuerying);
-    }
-
-    static DatabaseAccessObject getDatabaseAccessObject() {
-        return databaseAccessObject;
+        queryTimer2.schedule(queryTaskObservation, 0, Main.timeBetweenQuerying);
     }
 
     public TreeMap<Calendar, ForecastedDay> getForecastDays() {
