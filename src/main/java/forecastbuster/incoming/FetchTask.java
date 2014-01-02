@@ -3,7 +3,6 @@ package forecastbuster.incoming;
 import forecastbuster.Main;
 import forecastbuster.incoming.entities.Forecast;
 import forecastbuster.incoming.entities.Observation;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -12,22 +11,20 @@ import org.w3c.dom.NodeList;
 
 import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.TimerTask;
 
-public class FetchTask extends TimerTask {
+public class FetchTask implements Runnable {
     static org.slf4j.Logger log = LoggerFactory.getLogger(FetchTask.class);
-    public FetchTask() {
-    }
 
+    @Override
     public void run() {
         synchronized (Main.actionLockObject) {
             Document forecastDocument = XMLFetcher.getDocFromUrl(Main.FORECAST_URL);
             NodeList forecastNodeList = forecastDocument.getElementsByTagName(Main.KEY_FORECAST);
-            ArrayList<Forecast> forecasts = new ArrayList<Forecast>(8);
+            ArrayList<Forecast> forecasts = new ArrayList<>(8);
             try {
                 iterateForecasts(forecastNodeList, forecasts);
             } catch (ParseException e) {
-                log.error(ExceptionUtils.getStackTrace(e));
+                log.error("Error while creating forecast objects from xml nodelist", e);
             }
 
             Document observationDocument = XMLFetcher.getDocFromUrl(Main.OBSERVATION_URL);
@@ -37,14 +34,14 @@ public class FetchTask extends TimerTask {
             try {
                 observation.createObservation(observationNodeList);
             } catch (ParseException e) {
-                log.error(ExceptionUtils.getStackTrace(e));
+                log.error("Error while creating observation objects from xml nodelist" ,e);
             }
             Main.getDatabaseAccessObject().saveObservationsAndSForecasts(observation, forecasts);
             Main.actionLockObject.notify();
         }
     }
 
-    void iterateForecasts(NodeList nodeList, ArrayList<Forecast> forecasts) throws ParseException {
+    private void iterateForecasts(NodeList nodeList, ArrayList<Forecast> forecasts) throws ParseException {
         for (int i = 0; i < nodeList.getLength(); i++) {
             Element element = (Element) nodeList.item(i);
             NodeList secondNodeList = element.getChildNodes();

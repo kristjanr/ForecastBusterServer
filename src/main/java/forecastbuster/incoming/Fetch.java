@@ -1,14 +1,27 @@
 package forecastbuster.incoming;
 
-import java.util.Timer;
+import forecastbuster.Main;
 
-import static forecastbuster.Main.timeBetweenFetchingData;
+import javax.servlet.ServletContextEvent;
+import javax.servlet.ServletContextListener;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
-public class Fetch {
+public class Fetch implements ServletContextListener {
+    private final static int TIME_BETWEEN_FETCHING_DATA = 1;
+    private ScheduledExecutorService scheduler;
 
-    public void start() {
-        Timer fetchTimer = new Timer("fetchTimer");
-        FetchTask dataFetchTask = new FetchTask();
-        fetchTimer.schedule(dataFetchTask, 0, timeBetweenFetchingData);
+    @Override
+    public void contextInitialized(ServletContextEvent event) {
+        Main.getDatabaseAccessObject().initSession();
+        scheduler = Executors.newSingleThreadScheduledExecutor();
+        scheduler.scheduleAtFixedRate(new FetchTask(), 0, TIME_BETWEEN_FETCHING_DATA, TimeUnit.HOURS);
+    }
+
+    @Override
+    public void contextDestroyed(ServletContextEvent event) {
+        scheduler.shutdownNow();
+        Main.getDatabaseAccessObject().close();
     }
 }

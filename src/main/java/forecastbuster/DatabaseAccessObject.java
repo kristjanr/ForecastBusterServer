@@ -3,8 +3,6 @@ package forecastbuster;
 import forecastbuster.incoming.entities.Forecast;
 import forecastbuster.incoming.entities.Observation;
 import forecastbuster.incoming.entities.Place;
-import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
@@ -23,8 +21,9 @@ import java.util.Properties;
 
 public class DatabaseAccessObject {
     private Session hibernateSession;
-    static Logger log = LoggerFactory.getLogger(DatabaseAccessObject.class);
+    private static final Logger log = LoggerFactory.getLogger(DatabaseAccessObject.class);
     private final Object sessionLockObject = new Object();
+    private SessionFactory sessionFactory;
 
     public DatabaseAccessObject() {
     }
@@ -35,7 +34,7 @@ public class DatabaseAccessObject {
             URL pUrl = this.getClass().getResource("/database.properties");
             properties.load(pUrl.openStream());
         } catch (IOException e) {
-            log.error(ExceptionUtils.getStackTrace(e));
+            log.error("Error while reading database.properties file", e);
         }
 
         Configuration databaseConfiguration = new Configuration();
@@ -44,15 +43,13 @@ public class DatabaseAccessObject {
         databaseConfiguration.setProperty("hibernate.connection.username", properties.getProperty("database.user"));
         databaseConfiguration.setProperty("hibernate.connection.password", properties.getProperty("database.password"));
         ServiceRegistry serviceRegistry = new ServiceRegistryBuilder().applySettings(databaseConfiguration.getProperties()).buildServiceRegistry();
-        SessionFactory sessionFactory = databaseConfiguration.buildSessionFactory(serviceRegistry);
+        sessionFactory = databaseConfiguration.buildSessionFactory(serviceRegistry);
         hibernateSession = sessionFactory.openSession();
-
     }
 
-    public void save(Object object) {
-        Transaction transaction = hibernateSession.beginTransaction();
-        hibernateSession.save(object);
-        transaction.commit();
+    public void close() {
+        hibernateSession.close();
+        sessionFactory.close();
     }
 
     public void saveObservationsAndSForecasts(Observation observation, ArrayList<Forecast> forecasts) {
@@ -68,7 +65,7 @@ public class DatabaseAccessObject {
         log.info("Saved observation and forecasts in " + timeForSavingForecastsAndObservations);
     }
 
-    public void saveObservationAndStations(Observation observation) {
+    void saveObservationAndStations(Observation observation) {
         synchronized (sessionLockObject) {
             hibernateSession.save(observation);
 
@@ -78,50 +75,18 @@ public class DatabaseAccessObject {
         }
     }
 
-    public void saveForecastsAndPlaces(ArrayList<Forecast> forecasts) {
+    void saveForecastsAndPlaces(ArrayList<Forecast> forecasts) {
         Forecast forecast;
         List<Place> places;
         synchronized (sessionLockObject) {
-            for (int i = 0; i < forecasts.size(); i++) {
-                forecast = forecasts.get(i);
+            for (Forecast forecast1 : forecasts) {
+                forecast = forecast1;
                 hibernateSession.save(forecast);
                 places = forecast.getPlaces();
-                for (int j = 0; j < places.size(); j++) {
-                    hibernateSession.save(places.get(j));
+                for (Place place : places) {
+                    hibernateSession.save(place);
                 }
             }
-        }
-    }
-
-    public List querySQL(String queryString, String name, Object value) {
-        synchronized (sessionLockObject) {
-            Query query = hibernateSession.createSQLQuery(queryString);
-            if (value != null) {
-                query.setParameter(name, value);
-            }
-            List results = query.list();
-            return results;
-        }
-    }
-
-    public List querySQL(String queryString, ArrayList parameters) {
-        synchronized (sessionLockObject) {
-            Query query = hibernateSession.createSQLQuery(queryString);
-            if (!parameters.isEmpty()) {
-                for (int i = 0; i < parameters.size(); i++) {
-                    query.setParameter(i, parameters.get(i));
-                }
-            }
-            List results = query.list();
-            return results;
-        }
-    }
-
-    public List querySQL(String queryString) {
-        synchronized (sessionLockObject) {
-            Query query = hibernateSession.createSQLQuery(queryString);
-            List results = query.list();
-            return results;
         }
     }
 }

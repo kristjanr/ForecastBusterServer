@@ -1,9 +1,5 @@
 package forecastbuster;
 
-import forecastbuster.incoming.Fetch;
-
-import java.io.IOException;
-
 public class Main {
     public static DatabaseAccessObject databaseAccessObject;
     public static final String FORECAST_URL = "http://www.emhi.ee/ilma_andmed/xml/forecast.php";
@@ -19,14 +15,7 @@ public class Main {
     public static final String KEY_NAME = "name";
     public static final String KEY_OBSERVATIONS = "observations";
     public static final String KEY_FORECAST = "forecast";
-    public static int timeBetweenFetchingData = 1000 * 60 * 60;
     public static final Object actionLockObject = new Object();
-
-    public static void main(String[] args) throws IOException {
-        getDatabaseAccessObject().initSession();
-        Fetch fetch = new Fetch();
-        fetch.start();
-    }
 
     public static DatabaseAccessObject getDatabaseAccessObject() {
         if (databaseAccessObject == null) {
