@@ -1,6 +1,6 @@
 package forecastbuster.incoming.entities;
 
-import forecastbuster.Main;
+import forecastbuster.Constants;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -8,8 +8,8 @@ public class Place {
     private long id;
     private String name;
     private String phenomenon;
-    private Float tempMin = null;
-    private Float tempMax = null;
+    private int tempMin;
+    private int tempMax;
     private Forecast forecast;
 
     static void createPlace(Forecast forecast, Node thirdNode) {
@@ -20,13 +20,13 @@ public class Place {
             Node fourthNode = fourthNodeList.item(m);
             String nodeName = fourthNode.getNodeName();
 
-            if (nodeName.equals(Main.KEY_PHENOMENON)) {
+            if (nodeName.equals(Constants.PHENOMENON)) {
                 place.setPhenomenon(fourthNode.getTextContent());
-            } else if (nodeName.equals(Main.KEY_TEMPMAX)) {
+            } else if (nodeName.equals(Constants.TEMPMAX)) {
                 place.setTempMax(fourthNode.getTextContent());
-            } else if (nodeName.equals(Main.KEY_TEMPMIN)) {
+            } else if (nodeName.equals(Constants.TEMPMIN)) {
                 place.setTempMin(fourthNode.getTextContent());
-            } else if (nodeName.equals(Main.KEY_NAME)) {
+            } else if (nodeName.equals(Constants.NAME)) {
                 place.setName(fourthNode.getTextContent());
             }
         }
@@ -73,27 +73,27 @@ public class Place {
         this.phenomenon = phenomenon;
     }
 
-    public Float getTempMin() {
+    public int getTempMin() {
         return tempMin;
     }
 
-    public void setTempMin(Float tempMin) {
+    public void setTempMin(int tempMin) {
         this.tempMin = tempMin;
     }
 
-    public Float getTempMax() {
+    public int getTempMax() {
         return tempMax;
     }
 
     public void setTempMin(String tempMin) {
-        this.tempMin = Float.parseFloat(tempMin);
+        this.tempMin = Integer.parseInt(tempMin);
     }
 
     public void setTempMax(String tempMax) {
-        this.tempMax = Float.parseFloat(tempMax);
+        this.tempMax = Integer.parseInt(tempMax);
     }
 
-    public void setTempMax(Float tempMax) {
+    public void setTempMax(int tempMax) {
         this.tempMax = tempMax;
     }
 

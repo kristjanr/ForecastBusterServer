@@ -1,7 +1,7 @@
 .classpath.project
 .settings/
 .idea/
-ForecastBuster.iml
+.iml
 /target
 *.class
 # Package Files #
@@ -9,3 +9,6 @@ ForecastBuster.iml
 *.war
 *.ear
 /logs
+/class
+/lib
+/appengine-generated

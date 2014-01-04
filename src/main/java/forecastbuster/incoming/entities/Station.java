@@ -1,6 +1,6 @@
 package forecastbuster.incoming.entities;
 
-import forecastbuster.Main;
+import forecastbuster.Constants;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -10,9 +10,9 @@ public class Station {
     private long id;
     private String name;
     private String phenomenon;
-    private Float airTemperature;
+    private float airTemperature;
     private Observation observation;
-    private static final String KEY_AIRTEMPERATURE = "airtemperature";
+
 
     public Station() {
     }
@@ -22,11 +22,11 @@ public class Station {
         for (int i = 0; i < nodeList.getLength(); i++) {
             Node node = nodeList.item(i);
             String nodeName = node.getNodeName();
-            if (nodeName.equals(Main.KEY_NAME)) {
+            if (nodeName.equals(Constants.NAME)) {
                 setName(node.getTextContent());
-            } else if (nodeName.equals(Main.KEY_PHENOMENON) && !node.getTextContent().isEmpty()) {
+            } else if (nodeName.equals(Constants.PHENOMENON) && !node.getTextContent().isEmpty()) {
                 setPhenomenon(node.getTextContent());
-            } else if (nodeName.equals(KEY_AIRTEMPERATURE) && !node.getTextContent().isEmpty()) {
+            } else if (nodeName.equals(Constants.AIRTEMPERATURE) && !node.getTextContent().isEmpty()) {
                 setAirTemperature(node.getTextContent());
             }
         }

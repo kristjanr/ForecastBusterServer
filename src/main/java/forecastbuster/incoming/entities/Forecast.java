@@ -1,6 +1,6 @@
 package forecastbuster.incoming.entities;
 
-import forecastbuster.Main;
+import forecastbuster.Constants;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -17,20 +17,20 @@ public class Forecast {
     private String timeOfDay;
     private Date timeOfUpdate;
     private String phenomenon;
-    private float tempMin;
-    private float tempMax;
+    private int tempMin;
+    private int tempMax;
     private String text;
     private ArrayList<Place> places;
 
     public Forecast() {
         timeOfUpdate = new Date();
-        places = new ArrayList<Place>();
+        places = new ArrayList<>();
     }
 
     public void createForecast(Element firstElement, Node secondNode) throws ParseException {
-        if (secondNode.getNodeName() == Main.KEY_NIGHT || secondNode.getNodeName() == Main.KEY_DAY) {
+        if (secondNode.getNodeName() == Constants.NIGHT || secondNode.getNodeName() == Constants.DAY) {
 
-            setDate(firstElement.getAttribute(Main.KEY_DATE));
+            setDate(firstElement.getAttribute(Constants.DATE));
 
             setTimeOfDay(secondNode.getNodeName());
             NodeList thirdNodeList = secondNode.getChildNodes();
@@ -39,17 +39,17 @@ public class Forecast {
                 Node thirdNode = thirdNodeList.item(k);
                 String s = thirdNode.getNodeName();
 
-                if (s.equals(Main.KEY_PHENOMENON)) {
+                if (s.equals(Constants.PHENOMENON)) {
                     setPhenomenon(thirdNode.getFirstChild().getTextContent());
-                } else if (s.equals(Main.KEY_TEMPMAX)) {
+                } else if (s.equals(Constants.TEMPMAX)) {
                     setTempMax(thirdNode.getFirstChild().getTextContent());
 
-                } else if (s.equals(Main.KEY_TEMPMIN)) {
+                } else if (s.equals(Constants.TEMPMIN)) {
                     setTempMin(thirdNode.getFirstChild().getTextContent());
 
-                } else if (s.equals(Main.KEY_TEXT)) {
+                } else if (s.equals(Constants.TEXT)) {
                     setText(thirdNode.getFirstChild().getTextContent());
-                } else if (s.equals(Main.KEY_PLACE)) {
+                } else if (s.equals(Constants.PLACE)) {
 
                     Place.createPlace(this, thirdNode);
                 }
@@ -124,28 +124,28 @@ public class Forecast {
         this.phenomenon = phenomenon;
     }
 
-    public float getTempMin() {
+    public int getTempMin() {
         return tempMin;
     }
 
-    public void setTempMin(float tempMin) {
+    public void setTempMin(int tempMin) {
         this.tempMin = tempMin;
     }
 
     public void setTempMin(String tempMin) {
-        this.tempMin = Float.parseFloat(tempMin);
+        this.tempMin = Integer.parseInt(tempMin);
     }
 
-    public float getTempMax() {
+    public int getTempMax() {
         return tempMax;
     }
 
-    public void setTempMax(float tempMax) {
+    public void setTempMax(int tempMax) {
         this.tempMax = tempMax;
     }
 
     public void setTempMax(String tempMax) {
-        this.tempMax = Float.parseFloat(tempMax);
+        this.tempMax = Integer.parseInt(tempMax);
     }
 
     public String getText() {

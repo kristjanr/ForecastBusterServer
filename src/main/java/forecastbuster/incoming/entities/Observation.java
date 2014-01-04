@@ -1,5 +1,6 @@
 package forecastbuster.incoming.entities;
 
+import forecastbuster.Constants;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -11,21 +12,20 @@ import java.util.Date;
 import java.util.List;
 
 public class Observation {
-    static final String KEY_TIMESTAMP = "timestamp";
-    private static final String KEY_STATION = "station";
+
 
     private long id;
     private Date timestamp;
-    private List<Station> stations = new ArrayList<Station>(39);
+    private List<Station> stations = new ArrayList<>(39);
 
     public void createObservation(NodeList nodeList) throws ParseException {
         Element element = (Element) nodeList.item(0);
-        String timestamp = element.getAttribute(KEY_TIMESTAMP);
+        String timestamp = element.getAttribute(Constants.TIMESTAMP);
         setTimestamp(timestamp);
         NodeList secondNodeList = element.getChildNodes();
         for (int i = 0; i < secondNodeList.getLength(); i++) {
             Node secondNode = secondNodeList.item(i);
-            if (secondNode.getNodeName() == KEY_STATION) {
+            if (secondNode.getNodeName() == Constants.STATION) {
                 NodeList thirdNodeList = secondNode.getChildNodes();
                 Station station = new Station(this, thirdNodeList);
                 stations.add(station);
